@@ -4,9 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BsChat</title>
+    <title>Bs- Chatbot</title>
     <link rel="icon" type="image/x-icon" href="https://i.ibb.co/HhBtgWh/logo.png">
     <style>
+        
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
@@ -177,8 +178,8 @@
             </div>
             <div id="messages">
                 <div class="message bot-message">Hello..! What are we going to do today?</div>
-                <div class="message bot-message">1. Review schedule</div>
-                <div class="message bot-message">2. Create schedule</div>
+                <div class="message bot-message">1. Review task</div>
+                <div class="message bot-message">2. Create task</div>
             </div>
         </div>
         <div id="user-input">
@@ -274,21 +275,21 @@
                 }
             } else if (!isScheduling && input === 'yes') {
                 if (tasks.length === 0) {
-                    addMessage('Your schedule is empty. No tasks to save.', 'bot-message');
+                    addMessage('Review task is empty now.', 'bot-message');
                 } else {
                     saveTasksToLocalStorage(tasks);
                     reviewSchedule = getTasksFromLocalStorage();
-                    addMessage('Your tasks have been added to the review schedule!', 'bot-message');
+                    addMessage('Your tasks have been added to the review tasks!', 'bot-message');
                     tasks = [];
                     taskCount = 0;
                     currentTask = 0;
-                    addMessage('Enter 1 to review \n\n 2 to create a schedule.', 'bot-message');
+                    addMessage('Enter 1 to review, 2 to create a task.', 'bot-message');
                 }
             } else if (!isScheduling && input === 'no') {
                 tasks = [];
                 taskCount = 0;
                 currentTask = 0;
-                addMessage('Tasks not saved. You can start over. Enter "2" to create a new schedule.', 'bot-message');
+                addMessage('Tasks not saved. You can start over. Enter "2" to create a new tasks.', 'bot-message');
             } else if (!isScheduling && input === 'new') {
                 restartChat();
             } else {
@@ -358,8 +359,8 @@
         function restartChat() {
             document.getElementById('messages').innerHTML = '';
             addMessage('Hello..! What are we going to do today?', 'bot-message');
-            addMessage('1. Review schedule', 'bot-message');
-            addMessage('2. Create schedule', 'bot-message');
+            addMessage('1. Review task', 'bot-message');
+            addMessage('2. Create task', 'bot-message');
         }
 
         function saveTasksToLocalStorage(tasks) {
