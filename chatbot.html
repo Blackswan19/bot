@@ -162,12 +162,13 @@
         .more img{
             width: 23%;
         }
-        input{
+        .user-input input{
             position: fixed;
             width: 57%;
             left: 19%;
             bottom: 10px;
             text-align: center;
+            background-color: #fff;
         }
          @media (max-width: 480px) {
             body {
@@ -181,15 +182,16 @@
             align-items: center;
             height: 100vh;
         }
-        input{
+        .user-input input{
             position: fixed;
             width: 85%;
             text-align: left;
             left: 15px;
             bottom: 12px;
+            background-color: #fff;
         }
         /* Modify the #user-input to be fixed at the bottom */
-        #user-input {
+        /* #user-input {
             display: flex;
             background-color: #fff;
             padding: 10px;
@@ -202,7 +204,7 @@
             max-width: 360px;
             width: 100%;
             z-index: 1000;
-        }
+        } */
 
         /* Adjust #chat-container to account for the fixed input */
         #chat-container {
@@ -354,7 +356,7 @@
                 <div class="message bot-message">2. Create task</div>
             </div>
         </div>
-        <div id="user-input">
+        <div class="user-input">
             <input type="text" id="user-message" placeholder="Enter the task here......">
         </div>
     </div>
