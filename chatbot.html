@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bs- Chatbot</title>
+    <title>BsBot</title>
     <link rel="icon" type="image/x-icon" href="https://i.ibb.co/HhBtgWh/logo.png">
     <style>
         body {
@@ -170,7 +170,7 @@
             text-align: center;
             background-color: #fff;
         }
-         @media (max-width: 480px) {
+        @media (max-width: 480px) {
             body {
                 display: block;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -190,23 +190,6 @@
             bottom: 12px;
             background-color: #fff;
         }
-        /* Modify the #user-input to be fixed at the bottom */
-        /* #user-input {
-            display: flex;
-            background-color: #fff;
-            padding: 10px;
-            border-top: 1px solid #ddd;
-            box-sizing: border-box;
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            max-width: 360px;
-            width: 100%;
-            z-index: 1000;
-        } */
-
-        /* Adjust #chat-container to account for the fixed input */
         #chat-container {
             display: flex;
             flex-direction: column;
@@ -348,12 +331,12 @@
         <div id="chatbox">
             <div class="more">
                 <h1>Chatbot Task's Saver</h1>
-                <img src="https://i.ibb.co/HhBtgWh/logo.png" alt="" style="border-radius: 50px;">
+                <img src="https://i.ibb.co/p0RZq1N/logo.png" alt="" style="border-radius: 50px;">
             </div>
             <div id="messages">
                 <div class="message bot-message">Hello..! What are we going to do today?</div>
-                <div class="message bot-message">1. Review task</div>
-                <div class="message bot-message">2. Create task</div>
+                <div class="message bot-message">1.Review task</div>
+                <div class="message bot-message">2.Create task</div>
             </div>
         </div>
         <div class="user-input">
@@ -361,7 +344,7 @@
         </div>
     </div>
     <div id="scroll-down-container">
-        <button id="scroll-down-button">BsChat</button>
+        <button id="scroll-down-button">BsBot</button>
     </div>
 
     <script>
@@ -533,8 +516,8 @@
         function restartChat() {
             document.getElementById('messages').innerHTML = '';
             addMessage('Hello..! What are we going to do today?', 'bot-message');
-            addMessage('1. Review task', 'bot-message');
-            addMessage('2. Create task', 'bot-message');
+            addMessage('1.Review task', 'bot-message');
+            addMessage('2.Create task', 'bot-message');
         }
 
         function saveTasksToLocalStorage(tasks) {
