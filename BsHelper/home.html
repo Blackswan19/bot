@@ -71,7 +71,7 @@
         /* Loading Overlay */
         .loading-overlay {
             display: none; /* Initially hidden */
-            position: relative;
+            position: fixed;
             left: 0;
             bottom: 10px;
             width: 100%;
@@ -112,7 +112,10 @@
         document.addEventListener('DOMContentLoaded', () => {
     const loadingOverlay = document.querySelector('.loading-overlay');
 
-    // Check if the overlay has been shown before
+    // Always hide the loading overlay on page load
+    loadingOverlay.style.display = 'none';
+
+    // Check if we should show the overlay
     if (!sessionStorage.getItem('overlayShown')) {
         // Show the loading overlay
         loadingOverlay.style.display = 'flex';
@@ -123,10 +126,7 @@
         // Hide the overlay after a delay
         setTimeout(() => {
             loadingOverlay.style.display = 'none';
-        }, 1000); // Delay of 1 second
-    } else {
-        // Hide the overlay immediately if it was already shown
-        loadingOverlay.style.display = 'none';
+        }, 1000); // Adjust delay to 1 second
     }
 
     // Refresh the page every 5 minutes (300000 ms)
