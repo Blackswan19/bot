@@ -76,7 +76,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgb(0, 0, 0);
+            background: rgba(0, 0, 0, 0.8);
             color: #fff;
             text-align: center;
             justify-content: center;
@@ -107,9 +107,15 @@
     </div>
 
     <!-- Loading Overlay -->
-    <div class="loading-overlay"><img src="logo.png" alt="" width="25%"><br><br>Loading....</div>
+    <div class="loading-overlay">Loading, please wait...</div>
 
     <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Hide the loading overlay when the page is loaded
+            const loadingOverlay = document.querySelector('.loading-overlay');
+            loadingOverlay.style.display = 'none';
+        });
+
         document.querySelectorAll('.delayed-link').forEach(link => {
             link.addEventListener('click', (e) => {
                 e.preventDefault(); // Prevent the default click behavior
