@@ -110,12 +110,14 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Hide the loading overlay when the page is loaded
             const loadingOverlay = document.querySelector('.loading-overlay');
-            loadingOverlay.style.display = 'none';
+            loadingOverlay.style.display = 'none'; // Hide the overlay
 
-            // Log to confirm script execution
-            console.log("Page loaded and script executed.");
+            // Refresh the page every 5 minutes (300000 ms)
+            setInterval(() => {
+                console.log("Refreshing page...");
+                window.location.reload();
+            }, 300000); // Change the time as needed
         });
 
         document.querySelectorAll('.delayed-link').forEach(link => {
@@ -132,12 +134,6 @@
                 }, 2000); // Delay in milliseconds (2000 ms = 2 seconds)
             });
         });
-
-        // Refresh the page every 5 minutes (300000 ms)
-        setInterval(() => {
-            console.log("Refreshing page..."); // Log to confirm interval execution
-            window.location.reload();
-        }, 300000); // Change the time as needed
     </script>
 </body>
 </html>
