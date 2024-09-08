@@ -110,43 +110,44 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const loadingOverlay = document.querySelector('.loading-overlay');
+    const loadingOverlay = document.querySelector('.loading-overlay');
 
-            // Check if we should show the overlay
-            if (!sessionStorage.getItem('overlayShown')) {
-                // Show the loading overlay
-                loadingOverlay.style.display = 'flex';
+    // Check if we should show the overlay
+    if (!sessionStorage.getItem('overlayShown')) {
+        // Show the loading overlay
+        loadingOverlay.style.display = 'flex';
 
-                // Set a flag in session storage
-                sessionStorage.setItem('overlayShown', 'true');
-                
-                // Hide the overlay after a delay
-                setTimeout(() => {
-                    loadingOverlay.style.display = 'none';
-                }, 2000); // Adjust delay if needed
-            }
+        // Set a flag in session storage
+        sessionStorage.setItem('overlayShown', 'true');
+        
+        // Hide the overlay after a delay
+        setTimeout(() => {
+            loadingOverlay.style.display = 'none';
+        }, 1000); // Adjust delay to 1 second
+    }
 
-            // Refresh the page every 5 minutes (300000 ms)
-            setInterval(() => {
-                console.log("Refreshing page...");
-                window.location.reload();
-            }, 300000); // Change the time as needed
-        });
+    // Refresh the page every 5 minutes (300000 ms)
+    setInterval(() => {
+        console.log("Refreshing page...");
+        window.location.reload();
+    }, 300000); // Change the time as needed
+});
 
-        document.querySelectorAll('.delayed-link').forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault(); // Prevent the default click behavior
-                const url = e.currentTarget.getAttribute('href'); // Get the href value
-                const loadingOverlay = document.querySelector('.loading-overlay');
+document.querySelectorAll('.delayed-link').forEach(link => {
+    link.addEventListener('click', (e) => {
+        e.preventDefault(); // Prevent the default click behavior
+        const url = e.currentTarget.getAttribute('href'); // Get the href value
+        const loadingOverlay = document.querySelector('.loading-overlay');
 
-                // Show the loading overlay
-                loadingOverlay.style.display = 'flex';
+        // Show the loading overlay
+        loadingOverlay.style.display = 'flex';
 
-                setTimeout(() => {
-                    window.location.href = url; // Redirect after delay
-                }, 2000); // Delay in milliseconds (2000 ms = 2 seconds)
-            });
-        });
+        setTimeout(() => {
+            window.location.href = url; // Redirect after delay
+        }, 1000); // Delay in milliseconds (1000 ms = 1 second)
+    });
+});
+
     </script>
 </body>
 </html>
