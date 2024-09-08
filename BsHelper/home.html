@@ -113,6 +113,9 @@
             // Hide the loading overlay when the page is loaded
             const loadingOverlay = document.querySelector('.loading-overlay');
             loadingOverlay.style.display = 'none';
+
+            // Log to confirm script execution
+            console.log("Page loaded and script executed.");
         });
 
         document.querySelectorAll('.delayed-link').forEach(link => {
@@ -132,6 +135,7 @@
 
         // Refresh the page every 5 minutes (300000 ms)
         setInterval(() => {
+            console.log("Refreshing page..."); // Log to confirm interval execution
             window.location.reload();
         }, 300000); // Change the time as needed
     </script>
