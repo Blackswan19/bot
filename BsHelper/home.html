@@ -112,7 +112,7 @@
         document.addEventListener('DOMContentLoaded', () => {
     const loadingOverlay = document.querySelector('.loading-overlay');
 
-    // Check if we should show the overlay
+    // Check if the overlay has been shown before
     if (!sessionStorage.getItem('overlayShown')) {
         // Show the loading overlay
         loadingOverlay.style.display = 'flex';
@@ -123,7 +123,10 @@
         // Hide the overlay after a delay
         setTimeout(() => {
             loadingOverlay.style.display = 'none';
-        }, 1000); // Adjust delay to 1 second
+        }, 1000); // Delay of 1 second
+    } else {
+        // Hide the overlay immediately if it was already shown
+        loadingOverlay.style.display = 'none';
     }
 
     // Refresh the page every 5 minutes (300000 ms)
