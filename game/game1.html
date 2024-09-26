@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Hit Game</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&family=Orbitron:wght@400..900&family=Red+Hat+Display:ital,wght@0,300..900;1,300..900&family=Strait&display=swap');
+        * {
+            color: rgb(255, 255, 255);
+            font-family: "Red Hat Display", sans-serif;
+        }
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        }
+
+        canvas {
+            display: block;
+    background-color: #181818;
+    touch-action: none;
+        }
+
+        #score, #misses {
+            position: absolute;
+            color: #fff;
+            font-size: 20px;
+            font-weight: bold;
+            padding: 10px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        #score {
+            top: 10px;
+            left: 10px;
+        }
+
+        #misses {
+            top: 10px;
+            right: 10px;
+        }
+
+        #gameOver {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #e74c3c;
+            font-size: 30px; /* Adjusted for mobile */
+            font-weight: bold;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
+            display: none;
+            text-align: center;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        #startButton {
+            position: absolute;
+            top: 50%; /* Moved below the game over text */
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 15px 30px;
+            font-size: 20px;
+            cursor: pointer;
+            background-color: #004cff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        #startButton:hover {
+            background-color: #004cff;
+            transform: translate(-50%, -50%) scale(1.05);
+        }
+
+        /* Controls for mobile */
+        .controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: none; /* Default to none */
+            justify-content: space-between;
+            width: 80%;
+        }
+
+        .button {
+            background-color: #004cff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 15px;
+            font-size: 20px;
+            cursor: pointer;
+            flex: 1;
+            margin: 0 5px;
+            transition: background-color 0.3s;
+        }
+
+        .button:hover {
+            background-color: #004cffa2;
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        @media (max-width: 480px) {
+            .controls {
+                display: flex; /* Show controls only on mobile */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="score">Score: 0</div>
+    <div id="misses">Misses: 0</div>
+    <div id="gameOver">Game Over!<br>Too many misses.</div>
+    <button id="startButton">Start Game</button>
+
+    <canvas id="gameCanvas"></canvas>
+    <div class="controls" id="mobileControls">
+        <button id="leftButton" class="button">Left</button>
+        <button id="rightButton" class="button">Right</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreDisplay = document.getElementById('score');
+        const missesDisplay = document.getElementById('misses');
+        const gameOverDisplay = document.getElementById('gameOver');
+        const startButton = document.getElementById('startButton');
+        const leftButton = document.getElementById('leftButton');
+        const rightButton = document.getElementById('rightButton');
+        const mobileControls = document.getElementById('mobileControls');
+
+        // Set canvas dimensions
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        // Function to manage mobile controls visibility
+        function toggleMobileControls() {
+            const isMobile = window.innerWidth <= 480;
+            mobileControls.style.display = isMobile ? 'flex' : 'none'; // Show or hide controls based on screen size
+        }
+
+        // Initial call to set controls visibility
+        toggleMobileControls();
+        window.addEventListener('resize', toggleMobileControls);
+
+        // Car object
+        const car = {
+            width: 50,
+            height: 100,
+            x: canvas.width / 2 - 25,
+            y: canvas.height - 120,
+            speed: 7,
+            moveLeft: false,
+            moveRight: false,
+        };
+
+        // Obstacles array
+        const obstacles = [];
+        let obstacleSpeed = 5;
+        let obstacleInterval = 2000; // Obstacles appear every 2 seconds
+
+        // Game state
+        let isGameRunning = false;
+        let score = 0;
+        let misses = 0;
+        let maxMisses = 20;  // Max allowed misses
+        let lastObstacleTime = 0;
+
+        // Car movement
+        function moveCar() {
+            if (car.moveLeft && car.x > 0) {
+                car.x -= car.speed;
+            }
+            if (car.moveRight && car.x < canvas.width - car.width) {
+                car.x += car.speed;
+            }
+        }
+
+        // Draw car with enhanced styling
+        function drawCar() {
+            ctx.fillStyle = 'blue';
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 1;
+            ctx.fillRect(car.x, car.y, car.width, car.height);
+            ctx.strokeRect(car.x, car.y, car.width, car.height);
+        }
+
+        // Draw obstacles with gradient
+        function drawObstacles() {
+            for (let i = 0; i < obstacles.length; i++) {
+                const obs = obstacles[i];
+                const gradient = ctx.createLinearGradient(obs.x, obs.y, obs.x + obs.width, obs.y + obs.height);
+                gradient.addColorStop(0, '#e74c3c');
+                gradient.addColorStop(1, '#c0392b');
+                ctx.fillStyle = gradient;
+                ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
+            }
+        }
+
+        // Update obstacles
+        function updateObstacles() {
+            for (let i = 0; i < obstacles.length; i++) {
+                obstacles[i].y += obstacleSpeed;
+
+                // Check if obstacle goes off-screen
+                if (obstacles[i].y > canvas.height) {
+                    obstacles.splice(i, 1); // Remove missed obstacle
+                    misses++;  // Increase miss count
+                    updateMisses();
+                    
+                    // End the game if misses exceed the max limit
+                    if (misses > maxMisses) {
+                        gameOver();
+                    }
+                }
+            }
+
+            // Add new obstacles periodically
+            if (Date.now() - lastObstacleTime > obstacleInterval) {
+                const obstacleWidth = Math.random() * 100 + 50;
+                const obstacleX = Math.random() * (canvas.width - obstacleWidth);
+                obstacles.push({
+                    x: obstacleX,
+                    y: -100,
+                    width: obstacleWidth,
+                    height: 50,
+                });
+                lastObstacleTime = Date.now();
+            }
+        }
+
+        // Collision detection and scoring
+        function checkCollision() {
+            for (let i = 0; i < obstacles.length; i++) {
+                const obs = obstacles[i];
+                if (car.x < obs.x + obs.width &&
+                    car.x + car.width > obs.x &&
+                    car.y < obs.y + obs.height &&
+                    car.height + car.y > obs.y) {
+                    // Collision detected: add score and remove obstacle
+                    score++;
+                    obstacles.splice(i, 1);
+                    updateScore();
+                }
+            }
+        }
+
+        // Update score
+        function updateScore() {
+            scoreDisplay.textContent = `Score: ${score}`;
+        }
+
+        // Update misses
+        function updateMisses() {
+            missesDisplay.textContent = `Misses: ${misses}`;
+        }
+
+        // Reset game
+        function resetGame() {
+            obstacles.length = 0;
+            car.x = canvas.width / 2 - 25;
+            score = 0;
+            misses = 0;
+            obstacleSpeed = 5;
+            obstacleInterval = 2000;
+            updateScore();
+            updateMisses();
+            gameOverDisplay.style.display = 'none';
+        }
+
+        // Game loop
+        function gameLoop() {
+            if (!isGameRunning) return;
+
+            // Clear the canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Move and draw the car
+            moveCar();
+            drawCar();
+
+            // Update and draw obstacles
+            updateObstacles();
+            drawObstacles();
+
+            // Check for collisions
+            checkCollision();
+
+            // Increase difficulty over time
+            obstacleSpeed += 0.002;
+            obstacleInterval -= 0.3;
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Game over
+        function gameOver() {
+            isGameRunning = false;
+            gameOverDisplay.style.display = 'block';
+            startButton.style.display = 'block';
+        }
+
+        // Start game
+        function startGame() {
+            isGameRunning = true;
+            resetGame();
+            startButton.style.display = 'none';
+            gameLoop();
+        }
+
+        // Event listeners for arrow keys
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') car.moveLeft = true;
+            if (e.key === 'ArrowRight') car.moveRight = true;
+        });
+
+        window.addEventListener('keyup', (e) => {
+            if (e.key === 'ArrowLeft') car.moveLeft = false;
+            if (e.key === 'ArrowRight') car.moveRight = false;
+        });
+
+        // Event listeners for mobile buttons
+        leftButton.addEventListener('touchstart', (e) => {
+            e.preventDefault(); // Prevent scrolling
+            car.moveLeft = true;
+        });
+        leftButton.addEventListener('touchend', () => {
+            car.moveLeft = false;
+        });
+
+        rightButton.addEventListener('touchstart', (e) => {
+            e.preventDefault(); // Prevent scrolling
+            car.moveRight = true;
+        });
+        rightButton.addEventListener('touchend', () => {
+            car.moveRight = false;
+        });
+
+        // Event listener for start button
+        startButton.addEventListener('click', startGame);
+    </script>
+
+</body>
+</html>

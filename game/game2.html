@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number Sequence Challenge</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+
+        #numberDisplay {
+            font-size: 3em;
+            margin: 20px;
+        }
+
+        #numberInput {
+            display: flex;
+            gap: 10px;
+        }
+
+        #numberInput input {
+            width: 50px;
+            height: 50px;
+            font-size: 2em;
+            text-align: center;
+        }
+
+        #status {
+            margin: 20px;
+            font-size: 1.5em;
+        }
+
+        #startButton {
+            padding: 10px 20px;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="numberDisplay">Get Ready!</div>
+
+    <div id="numberInput"></div>
+
+    <div id="status"></div>
+
+    <button id="startButton">Start Game</button>
+
+    <script>
+        const numberDisplay = document.getElementById('numberDisplay');
+        const numberInputDiv = document.getElementById('numberInput');
+        const statusDiv = document.getElementById('status');
+        const startButton = document.getElementById('startButton');
+
+        let numberSequence = [];
+        let userSequence = [];
+        let currentLevel = 1;
+        let lives = 3;
+        let displayTime = 1000;
+
+        // Generate a random number between 0 and 9
+        function getRandomNumber() {
+            return Math.floor(Math.random() * 10);
+        }
+
+        // Display the number sequence to the player
+        function showNumberSequence() {
+            numberInputDiv.innerHTML = ''; // Clear input
+            userSequence = []; // Clear user sequence
+            let index = 0;
+            numberDisplay.textContent = numberSequence[index];
+
+            const intervalId = setInterval(() => {
+                index++;
+                if (index < numberSequence.length) {
+                    numberDisplay.textContent = numberSequence[index];
+                } else {
+                    clearInterval(intervalId);
+                    numberDisplay.textContent = 'Enter the sequence!';
+                    createNumberInputs();
+                }
+            }, displayTime);
+        }
+
+        // Create input fields for user to enter the sequence
+        function createNumberInputs() {
+            numberInputDiv.innerHTML = '';
+            for (let i = 0; i < numberSequence.length; i++) {
+                const input = document.createElement('input');
+                input.type = 'number';
+                input.maxLength = 1;
+                input.addEventListener('input', handleInputChange);
+                numberInputDiv.appendChild(input);
+            }
+        }
+
+        // Handle user input
+        function handleInputChange(event) {
+            const inputs = document.querySelectorAll('#numberInput input');
+            userSequence = Array.from(inputs).map(input => parseInt(input.value));
+
+            if (userSequence.length === numberSequence.length && !userSequence.includes(NaN)) {
+                checkUserSequence();
+            }
+        }
+
+        // Check if the user input matches the number sequence
+        function checkUserSequence() {
+            const isCorrect = numberSequence.every((num, idx) => num === userSequence[idx]);
+
+            if (isCorrect) {
+                statusDiv.textContent = `Correct! Level ${currentLevel + 1} starting...`;
+                setTimeout(nextLevel, 1000);
+            } else {
+                lives--;
+                statusDiv.textContent = `Wrong! Lives remaining: ${lives}`;
+                if (lives === 0) {
+                    statusDiv.textContent = 'Game Over! Click Start to play again.';
+                    resetGame();
+                }
+            }
+        }
+
+        // Move to the next level
+        function nextLevel() {
+            currentLevel++;
+            numberSequence.push(getRandomNumber());
+            showNumberSequence();
+        }
+
+        // Start the game
+        function startGame() {
+            currentLevel = 1;
+            lives = 3;
+            numberSequence = Array.from({ length: currentLevel }, getRandomNumber);
+            statusDiv.textContent = `Level 1 - Lives: ${lives}`;
+            showNumberSequence();
+        }
+
+        // Reset the game
+        function resetGame() {
+            startButton.disabled = false;
+            numberDisplay.textContent = 'Get Ready!';
+            numberInputDiv.innerHTML = '';
+            numberSequence = [];
+            userSequence = [];
+        }
+
+        // Event listener for start button
+        startButton.addEventListener('click', () => {
+            startButton.disabled = true;
+            startGame();
+        });
+    </script>
+
+</body>
+</html>

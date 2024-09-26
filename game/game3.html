@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Pattern Memory</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f5f5f5;
+            font-family: Arial, sans-serif;
+        }
+
+        #grid {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-template-rows: repeat(3, 100px);
+            gap: 10px;
+        }
+
+        .cell {
+            width: 100px;
+            height: 100px;
+            background-color: lightgray;
+            border: 2px solid #333;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #status {
+            margin-top: 20px;
+            font-size: 1.5em;
+        }
+
+        #startButton {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 1.2em;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="grid"></div>
+    <div id="status">Press Start to Begin</div>
+    <button id="startButton">Start Game</button>
+
+    <script>
+        const grid = document.getElementById('grid');
+        const statusDiv = document.getElementById('status');
+        const startButton = document.getElementById('startButton');
+        const gridSize = 9; // 3x3 grid
+        let pattern = [];
+        let playerPattern = [];
+        let currentLevel = 1;
+        let lives = 3;
+        let showingPattern = false;
+
+        // Create a 3x3 grid of cells
+        function createGrid() {
+            grid.innerHTML = '';
+            for (let i = 0; i < gridSize; i++) {
+                const cell = document.createElement('div');
+                cell.classList.add('cell');
+                cell.dataset.index = i;
+                cell.addEventListener('click', handleCellClick);
+                grid.appendChild(cell);
+            }
+        }
+
+        // Handle clicks on the grid cells
+        function handleCellClick(event) {
+            if (showingPattern) return; // Disable clicking while showing pattern
+            const index = parseInt(event.target.dataset.index);
+
+            playerPattern.push(index);
+            highlightCell(index, '#8fbc8f'); // Temporary highlight to show user click
+
+            setTimeout(() => {
+                resetCell(index); // Reset color back after 300ms
+            }, 300);
+
+            if (playerPattern.length === pattern.length) {
+                checkPlayerPattern();
+            }
+        }
+
+        // Highlight the selected cell
+        function highlightCell(index, color) {
+            const cell = document.querySelector(`.cell[data-index='${index}']`);
+            cell.style.backgroundColor = color;
+        }
+
+        // Reset the cell to its default color
+        function resetCell(index) {
+            const cell = document.querySelector(`.cell[data-index='${index}']`);
+            cell.style.backgroundColor = 'lightgray';
+        }
+
+        // Check if the player's pattern matches the game's pattern
+        function checkPlayerPattern() {
+            const isCorrect = pattern.every((num, idx) => num === playerPattern[idx]);
+
+            if (isCorrect) {
+                statusDiv.textContent = `Correct! Moving to level ${currentLevel + 1}`;
+                setTimeout(nextLevel, 1000);
+            } else {
+                lives--;
+                statusDiv.textContent = `Wrong! Lives remaining: ${lives}`;
+                if (lives === 0) {
+                    statusDiv.textContent = 'Game Over! Click Start to play again.';
+                    resetGame();
+                }
+            }
+        }
+
+        // Start the next level
+        function nextLevel() {
+            playerPattern = [];
+            currentLevel++;
+            addToPattern();
+            showPattern();
+        }
+
+        // Add a new square to the pattern
+        function addToPattern() {
+            const randomCell = Math.floor(Math.random() * gridSize);
+            pattern.push(randomCell);
+        }
+
+        // Show the pattern to the player
+        function showPattern() {
+            showingPattern = true;
+            let delay = 0;
+
+            pattern.forEach((index, i) => {
+                setTimeout(() => {
+                    highlightCell(index, '#ff6347'); // Highlight in orange
+                }, delay);
+
+                delay += 600;
+
+                setTimeout(() => {
+                    resetCell(index);
+                    if (i === pattern.length - 1) {
+                        showingPattern = false;
+                    }
+                }, delay);
+            });
+        }
+
+        // Start the game
+        function startGame() {
+            currentLevel = 1;
+            lives = 3;
+            pattern = [];
+            playerPattern = [];
+            statusDiv.textContent = 'Watch the pattern!';
+            addToPattern();
+            showPattern();
+        }
+
+        // Reset the game
+        function resetGame() {
+            createGrid();
+            pattern = [];
+            playerPattern = [];
+            showingPattern = false;
+            startButton.disabled = false;
+        }
+
+        // Event listener for the Start button
+        startButton.addEventListener('click', () => {
+            startButton.disabled = true;
+            startGame();
+        });
+
+        // Initialize the grid when the page loads
+        window.onload = createGrid;
+
+    </script>
+
+</body>
+</html>
