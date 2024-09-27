@@ -6,7 +6,7 @@
     <title>BsBlockhiter</title>
     <link rel="icon" type="image/x-icon" href="https://i.ibb.co/gW8Py0B/BS.png">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&family=Orbitron:wght@400..900&family=Red+Hat+Display:ital,wght@0,300..900&family=Strait&display=swap');
+         @import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&family=Orbitron:wght@400..900&family=Red+Hat+Display:ital,wght@0,300..900&family=Strait&display=swap');
         * {
             color: rgb(255, 255, 255);
             font-family: "Red Hat Display", sans-serif;
@@ -44,16 +44,17 @@
         }
 
         #gameOver {
-            position: fixed;
-    background: #3e0101;
-    width: 100%;
-    text-align: center;
-    top: 35%;
-    padding: 14px 0px;
-    color: white;
-    font-size: 18px;
-    font-weight: 600;
-    display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #ff1900;
+            font-size: 30px; /* Adjusted for mobile */
+            font-weight: bold;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
+            display: none;
+            text-align: center;
+            animation: fadeIn 1s ease-in-out;
         }
 
         #startButton, #pauseButton, #rulesButton {
@@ -178,6 +179,7 @@
 
         }
     </style>
+    </style>
 </head>
 <body>
 
@@ -188,10 +190,11 @@
         <button id="pauseButton">Pause</button>
         <button id="rulesButton">Rules</button>
     </div>
-    <button id="startButton">Start Game</button>
+    <button id="startButton"><span style="font-size: 35px;
+    color: #004cff;">BsBlockhiter</span><br> Start Game</button>
     <canvas id="gameCanvas"></canvas>
     <div class="controls" id="mobileControls" style="
-        display: flex;
+    display: flex;
         position: fixed;
         width: 115%;
         left: 50%;
@@ -210,7 +213,7 @@
 
     <div id="rulesModal">
         <h2>Game Rules</h2>
-        <p>1. Move your car left and right to avoid obstacles.</p>
+        <p>1. Move your block left and right to hit the obstacles.</p>
         <p>2. Score points by hitting obstacles.</p>
         <p>3. You have a maximum of 20 misses. If you exceed this, the game is over!</p>
         <p>4. The game speeds up over time, so stay alert!</p>
@@ -361,7 +364,8 @@
                 updateObstacles();
                 drawObstacles();
                 checkCollision();
-
+                obstacleSpeed += 0.002;
+            obstacleInterval -= 0.3;
                 requestAnimationFrame(gameLoop);
             }
         }
