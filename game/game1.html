@@ -17,7 +17,11 @@
             font-family: 'Arial', sans-serif;
             background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
         }
-
+        #exitFullscreenButton {
+            top: 10px;
+            right: 10px;
+            display: none;
+        }
         canvas {
             display: block;
             background-color: #181818;
@@ -56,7 +60,7 @@
     display: none;
         }
 
-        #startButton, #pauseButton, #rulesButton {
+        #startButton, #pauseButton, #rulesButton, #exitFullscreenButton {
             position: absolute;
             padding: 15px 30px;
             font-size: 15px;
@@ -152,7 +156,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    position: fixed;
+ position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
@@ -204,6 +208,7 @@
         <button id="leftButton" class="button"></button>
         <button id="rightButton" class="button"></button>
     </div>
+    <button id="exitFullscreenButton">Exit Full-Screen</button>
 
     <!-- Countdown Display -->
     <div id="countdown" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 48px; font-weight: bold; color: white; display: none;">
@@ -234,6 +239,7 @@
         const rulesModal = document.getElementById('rulesModal');
         const closeRulesButton = document.getElementById('closeRules');
         const countdownDisplay = document.getElementById('countdown');
+        const exitFullscreenButton = document.getElementById('exitFullscreenButton');
 
         function resizeCanvas() {
             canvas.width = window.innerWidth;
@@ -279,7 +285,7 @@
         }
 
         function drawCar() {
-            ctx.fillStyle = 'blue';
+            ctx .fillStyle = 'blue';
             ctx.strokeStyle = 'white';
             ctx.lineWidth = 1;
             ctx.fillRect(car.x, car.y, car.width, car.height);
@@ -364,7 +370,7 @@
                 drawObstacles();
                 checkCollision();
                 obstacleSpeed += 0.002;
-            obstacleInterval -= 0.3;
+                obstacleInterval -= 0.3;
                 requestAnimationFrame(gameLoop);
             }
         }
@@ -397,6 +403,15 @@
         }
 
         function startGame() {
+            if (document.fullscreenElement === null) {
+                if (document.documentElement.requestFullscreen) {
+                    document.documentElement.requestFullscreen();
+                } else if (document.documentElement.webkitRequestFullscreen) {
+                    document.documentElement.webkitRequestFullscreen();
+                } else if (document.documentElement.msRequestFullscreen) {
+                    document.documentElement.msRequestFullscreen();
+                }
+            }
             startButton.style.display = 'none';  // Hide start button
             let countdown = 10;  // Set countdown to 10 seconds
             countdownDisplay.textContent = countdown;  // Show the initial countdown
@@ -412,8 +427,20 @@
                     clearInterval(countdownInterval);  // Stop the countdown
                     countdownDisplay.style.display = 'none';  // Hide the countdown
                     isGameRunning = true;  // Start the game
-                    resetGame();  // Reset game state
+                    resetGame(); // Reset game state
                     gameLoop();  // Start game loop
+
+                    // Request full screen
+                    const elem = document.documentElement;
+                    if (elem.requestFullscreen) {
+                        elem.requestFullscreen();
+                    } else if (elem.mozRequestFullScreen) { /* Firefox */
+                        elem.mozRequestFullScreen();
+                    } else if (elem.webkitRequestFullScreen) { /* Chrome, Safari & Opera */
+                        elem.webkitRequestFullScreen();
+                    } else if (elem.msRequestFullScreen) { /* IE/Edge */
+                        elem.msRequestFullScreen();
+                    }
                 }
             }, 1000);  // Update countdown every second
         }
@@ -445,6 +472,13 @@
 
         rulesButton.addEventListener('click', () => rulesModal.style.display = 'block');
         closeRulesButton.addEventListener('click', () => rulesModal.style.display = 'none');
+
+        exitFullscreenButton.addEventListener('click', () => {
+            if (document.fullscreenElement) {
+                document.exitFullscreen();
+            }
+        });
+
     </script>
 </body>
 </html>
