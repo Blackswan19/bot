@@ -6,7 +6,7 @@
     <title>BsBlockhiter</title>
     <link rel="icon" type="image/x-icon" href="https://i.ibb.co/gW8Py0B/BS.png">
     <style>
-         @import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&family=Orbitron:wght@400..900&family=Red+Hat+Display:ital,wght@0,300..900&family=Strait&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&family=Orbitron:wght@400..900&family=Red+Hat+Display:ital,wght@0,300..900&family=Strait&display=swap');
         * {
             color: rgb(255, 255, 255);
             font-family: "Red Hat Display", sans-serif;
@@ -45,18 +45,18 @@
 
         #gameOver {
             position: fixed;
-    background: #3e0101;
-    width: 100%;
-    text-align: center;
-    top: 35%;
-    padding: 14px 0px;
-    color: white;
-    font-size: 18px;
-    font-weight: 600;
-    display: none;
+            background: #3e0101;
+            width: 100%;
+            text-align: center;
+            top: 35%;
+            padding: 14px 0px;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            display: none;
         }
 
-        #startButton, #pauseButton, #rulesButton {
+        #startButton, #pauseButton, #rulesButton, #exitFullscreenButton {
             position: absolute;
             padding: 15px 30px;
             font-size: 15px;
@@ -90,6 +90,12 @@
             top: 100px;
             right: 10px;
             background: none;
+        }
+
+        #exitFullscreenButton {
+            top: 10px;
+            right: 10px;
+            display: none;
         }
 
         .controls {
@@ -136,48 +142,35 @@
             font-weight: bold;
             margin-top: 10px;
         }
-       .button {
-    width: 100px; /* Set button width */
-    height: 50px; /* Set button height */
-}
-
-/* For smaller screens, reduce the padding or use a more responsive layout */
-     @keyframes fadeIn {
-            0% { opacity: 0; }
-            100% { opacity: 1; }
-        }
 
         @media (max-width: 480px) {
             #mobileControls {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    width: 100%; /* Ensures it takes the full width */
-    padding: 10px 20px; /* Adds some padding for aesthetics */
-    z-index: 1000; /* Ensures it stays above other elements */
-    
-}
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                width: 100%;
+                padding: 10px 20px;
+                z-index: 1000;
+            }
 
-.button {
-    width: 100px;
-        height: 50px;
-        color: white;
-        border: none;
-        border-radius: 6px;
-        padding: 15px;
-        font-size: 18px;
-        cursor: pointer;
-        margin: 0 65px;
-        background: none;
-        border: solid 1px gray;
-}
-
+            .button {
+                width: 100px;
+                height: 50px;
+                color: white;
+                border: none;
+                border-radius: 6px;
+                padding: 15px;
+                font-size: 18px;
+                cursor: pointer;
+                margin: 0 65px;
+                background: none;
+                border: solid 1px gray;
+            }
         }
-    </style>
     </style>
 </head>
 <body>
@@ -189,21 +182,15 @@
         <button id="pauseButton">Pause</button>
         <button id="rulesButton">Rules</button>
     </div>
-    <button id="startButton"><span style="font-size: 35px;
-    color: #004cff;">BsBlockhiter</span><br> Start Game</button>
+    <button id="startButton"><span style="font-size: 35px; color: #004cff;">BsBlockhiter</span><br> Start Game</button>
     <canvas id="gameCanvas"></canvas>
-    <div class="controls" id="mobileControls" style="
-    display: flex;
-        position: fixed;
-        width: 115%;
-        left: 50%;
-        bottom: 220px;
-        gap: 66px;
-        margin: 0px;
-">
+    <div class="controls" id="mobileControls" style="display: flex; position: fixed; width: 115%; left: 50%; bottom: 220px; gap: 66px; margin: 0px;">
         <button id="leftButton" class="button"></button>
         <button id="rightButton" class="button"></button>
     </div>
+
+    <!-- Exit Full-Screen Button -->
+    <button id="exitFullscreenButton">Exit Full-Screen</button>
 
     <!-- Countdown Display -->
     <div id="countdown" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 48px; font-weight: bold; color: white; display: none;">
@@ -234,6 +221,7 @@
         const rulesModal = document.getElementById('rulesModal');
         const closeRulesButton = document.getElementById('closeRules');
         const countdownDisplay = document.getElementById('countdown');
+        const exitFullscreenButton = document.getElementById('exitFullscreenButton');
 
         function resizeCanvas() {
             canvas.width = window.innerWidth;
@@ -270,133 +258,105 @@
         let lastObstacleTime = 0;
 
         function moveCar() {
-            if (car.moveLeft && car.x > 0) {
-                car.x -= car.speed;
-            }
-            if (car.moveRight && car.x < canvas.width - car.width) {
-                car.x += car.speed;
-            }
+            if (car.moveLeft) car.x -= car.speed;
+            if (car.moveRight) car.x += car.speed;
+            if (car.x < 0) car.x = 0;
+            if (car.x + car.width > canvas.width) car.x = canvas.width - car.width;
         }
 
         function drawCar() {
-            ctx.fillStyle = 'blue';
-            ctx.strokeStyle = 'white';
-            ctx.lineWidth = 1;
+            ctx.fillStyle = '#004cff';
             ctx.fillRect(car.x, car.y, car.width, car.height);
-            ctx.strokeRect(car.x, car.y, car.width, car.height);
         }
 
         function drawObstacles() {
+            ctx.fillStyle = 'red';
             for (let i = 0; i < obstacles.length; i++) {
-                const obs = obstacles[i];
-                const gradient = ctx.createLinearGradient(obs.x, obs.y, obs.x + obs.width, obs.y + obs.height);
-                gradient.addColorStop(0, '#ff1900');
-                gradient.addColorStop(1, '#ff1900');
-                ctx.fillStyle = gradient;
-                ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
+                const obstacle = obstacles[i];
+                ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
             }
         }
 
-        function updateObstacles() {
-    for (let i = 0; i < obstacles.length; i++) {
-        obstacles[i].y += obstacleSpeed;
+        function generateObstacle() {
+            const width = 50;
+            const x = Math.random() * (canvas.width - width);
+            obstacles.push({
+                x: x,
+                y: -100,
+                width: width,
+                height: 100,
+            });
+        }
 
-        if (obstacles[i].y > canvas.height) {
-            obstacles.splice(i, 1);
-            misses++;
-            missesDisplay.textContent = `Misses: ${misses}`;
-            if (misses >= maxMisses) {
-                endGame();
+        function moveObstacles() {
+            const currentTime = performance.now();
+            if (currentTime - lastObstacleTime > obstacleInterval) {
+                generateObstacle();
+                lastObstacleTime = currentTime;
             }
-        }
-    }
-
-    const currentTime = Date.now();
-    if (currentTime - lastObstacleTime > obstacleInterval) {
-        const shapeType = Math.random();  // Random number to decide the shape
-
-        let obsWidth, obsHeight, isCube;
-        
-        // Randomly decide whether it's a square, rectangle, or cube
-        if (shapeType < 0.33) {
-            // Square
-            obsWidth = obsHeight = 50;
-            isCube = false;
-        } else if (shapeType < 0.66) {
-            // Rectangle
-            obsWidth = 70;
-            obsHeight = 40;
-            isCube = false;
-        } else {
-            // Cube
-            obsWidth = obsHeight = 50;
-            isCube = true;
-        }
-
-        const obsX = Math.random() * (canvas.width - obsWidth);
-        const obsY = -obsHeight;
-        obstacles.push({ x: obsX, y: obsY, width: obsWidth, height: obsHeight, isCube: isCube });
-        lastObstacleTime = currentTime;
-    }
-}
-
-        function checkCollision() {
             for (let i = 0; i < obstacles.length; i++) {
-                const obs = obstacles[i];
-                if (car.x < obs.x + obs.width &&
-                    car.x + car.width > obs.x &&
-                    car.y < obs.y + obs.height &&
-                    car.height + car.y > obs.y) {
+                const obstacle = obstacles[i];
+                obstacle.y += obstacleSpeed;
+                if (obstacle.y > canvas.height) {
                     obstacles.splice(i, 1);
-                    score++;
-                    scoreDisplay.textContent = `Score: ${score}`;
-                    return;
+                    misses++;
+                    updateMissesDisplay();
+                    i--;
+                    if (misses >= maxMisses) {
+                        endGame();
+                    }
                 }
             }
         }
 
-        function gameLoop() {
-            if (isGameRunning && !isPaused) {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                moveCar();
-                drawCar();
-                updateObstacles();
-                drawObstacles();
-                checkCollision();
-                obstacleSpeed += 0.002;
-            obstacleInterval -= 0.3;
-                requestAnimationFrame(gameLoop);
+        function detectCollision() {
+            for (let i = 0; i < obstacles.length; i++) {
+                const obstacle = obstacles[i];
+                if (
+                    car.x < obstacle.x + obstacle.width &&
+                    car.x + car.width > obstacle.x &&
+                    car.y < obstacle.y + obstacle.height &&
+                    car.y + car.height > obstacle.y
+                ) {
+                    obstacles.splice(i, 1);
+                    score++;
+                    updateScoreDisplay();
+                    i--;
+                }
             }
         }
 
-        function endGame() {
-            isGameRunning = false;
-            gameOverDisplay.style.display = 'block';
-            setTimeout(() => {
-                gameOverDisplay.style.display = 'none';
-                startButton.style.display = 'block';
-                score = 0;
-                misses = 0;
-                scoreDisplay.textContent = `Score: ${score}`;
-                missesDisplay.textContent = `Misses: ${misses}`;
-            }, 3000);
+        function updateScoreDisplay() {
+            scoreDisplay.textContent = `Score: ${score}`;
         }
 
-        function resetGame() {
-            car.x = canvas.width / 2 - car.width / 2;
-            car.y = canvas.height - car.height - 20;
-            obstacles.length = 0;
-            obstacleSpeed = 5;
-            obstacleInterval = 2000;
-            score = 0;
-            misses = 0;
-            scoreDisplay.textContent = `Score: ${score}`;
+        function updateMissesDisplay() {
             missesDisplay.textContent = `Misses: ${misses}`;
-            isPaused = false;
-            gameOverDisplay.style.display = 'none';
+        }
+
+        function gameLoop() {
+            if (!isGameRunning || isPaused) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            moveCar();
+            moveObstacles();
+            detectCollision();
+            drawCar();
+            drawObstacles();
+            requestAnimationFrame(gameLoop);
         }
 
         function startGame() {
+            // Request full-screen mode (optional)
+            if (document.fullscreenElement === null) { // Only request if not already in full-screen
+                if (document.documentElement.requestFullscreen) {
+                    document.documentElement.requestFullscreen();
+                } else if (document.documentElement.webkitRequestFullscreen) { /* Safari */
+                    document.documentElement.webkitRequestFullscreen();
+                } else if (document.documentElement.msRequestFullscreen) { /* IE11 */
+                    document.documentElement.msRequestFullscreen();
+                }
+            }
+
             startButton.style.display = 'none';  // Hide start button
             let countdown = 10;  // Set countdown to 10 seconds
             countdownDisplay.textContent = countdown;  // Show the initial countdown
@@ -418,33 +378,91 @@
             }, 1000);  // Update countdown every second
         }
 
+        function resetGame() {
+            isPaused = false;
+            score = 0;
+            misses = 0;
+            obstacleSpeed = 5;
+            obstacles.length = 0;
+            updateScoreDisplay();
+            updateMissesDisplay();
+            gameOverDisplay.style.display = 'none';
+        }
+
+        function endGame() {
+            isGameRunning = false;
+            gameOverDisplay.style.display = 'block';
+        }
+
+        function togglePause() {
+            if (!isGameRunning) return;
+            isPaused = !isPaused;
+            if (!isPaused) gameLoop();
+        }
+
+        pauseButton.addEventListener('click', togglePause);
+
+        rulesButton.addEventListener('click', () => {
+            rulesModal.style.display = 'block';
+        });
+
+        closeRulesButton.addEventListener('click', () => {
+            rulesModal.style.display = 'none';
+        });
+
         startButton.addEventListener('click', startGame);
 
-        pauseButton.addEventListener('click', function () {
-            isPaused = !isPaused;
-            if (!isPaused && isGameRunning) {
-                gameLoop();
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft' || e.key === 'a') {
+                car.moveLeft = true;
+            } else if (e.key === 'ArrowRight' || e.key === 'd') {
+                car.moveRight = true;
             }
         });
 
-        leftButton.addEventListener('touchstart', () => car.moveLeft = true);
-        leftButton.addEventListener('touchend', () => car.moveLeft = false);
-
-        rightButton.addEventListener('touchstart', () => car.moveRight = true);
-        rightButton.addEventListener('touchend', () => car.moveRight = false);
-
-        window.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowLeft') car.moveLeft = true;
-            if (e.key === 'ArrowRight') car.moveRight = true;
+        document.addEventListener('keyup', (e) => {
+            if (e.key === 'ArrowLeft' || e.key === 'a') {
+                car.moveLeft = false;
+            } else if (e.key === 'ArrowRight' || e.key === 'd') {
+                car.moveRight = false;
+            }
         });
 
-        window.addEventListener('keyup', (e) => {
-            if (e.key === 'ArrowLeft') car.moveLeft = false;
-            if (e.key === 'ArrowRight') car.moveRight = false;
+        leftButton.addEventListener('touchstart', () => {
+            car.moveLeft = true;
         });
 
-        rulesButton.addEventListener('click', () => rulesModal.style.display = 'block');
-        closeRulesButton.addEventListener('click', () => rulesModal.style.display = 'none');
+        leftButton.addEventListener('touchend', () => {
+            car.moveLeft = false;
+        });
+
+        rightButton.addEventListener('touchstart', () => {
+            car.moveRight = true;
+        });
+
+        rightButton.addEventListener('touchend', () => {
+            car.moveRight = false;
+        });
+
+        // Handle full-screen changes
+        document.addEventListener('fullscreenchange', () => {
+            if (!document.fullscreenElement) {
+                console.log("Exited full-screen mode, continuing game in small screen.");
+                // Optionally display a message here or adjust UI for small screen
+            }
+        });
+
+        // Exit Full-Screen Button Event
+        exitFullscreenButton.addEventListener('click', () => {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) { /* Safari */
+                document.webkitExitFullscreen();
+            } else if (document.msExitFullscreen) { /* IE11 */
+                document.msExitFullscreen();
+            }
+        });
+
     </script>
 </body>
 </html>
