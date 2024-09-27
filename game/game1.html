@@ -155,16 +155,19 @@
 </head>
 <body>
 
-    <div id="score">Score: 0</div>
-    <div id="misses">Misses: 0</div>
-    <div id="gameOver">Game Over!<br>Too many misses.</div>
+    <div class="all" style="position: fixed;
+    left: 0px;
+    right: 0px;">
+        <div id="score">Score: 0</div>
+        <div id="misses">Misses: 0</div>
+        <div id="gameOver">Game Over!<br>Too many misses.</div>
+        <button id="pauseButton">Pause</button>
+        <button id="rulesButton">Rules</button>    
+    </div>
     <button id="startButton">Start Game</button>
-    <button id="pauseButton">Pause</button>
-    <button id="rulesButton">Rules</button>
-
     <canvas id="gameCanvas"></canvas>
     <div class="controls" id="mobileControls" style="display: flex;
-    gap: 152px;
+    gap: 100px;
     width: 100%;">
         <button id="leftButton" class="button">Left</button>
         <button id="rightButton" class="button">Right</button>
