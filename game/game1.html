@@ -207,262 +207,284 @@
     </div>
 
     <script>
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
-        const scoreDisplay = document.getElementById('score');
-        const missesDisplay = document.getElementById('misses');
-        const gameOverDisplay = document.getElementById('gameOver');
-        const startButton = document.getElementById('startButton');
-        const pauseButton = document.getElementById('pauseButton');
-        const rulesButton = document.getElementById('rulesButton');
-        const leftButton = document.getElementById('leftButton');
-        const rightButton = document.getElementById('rightButton');
-        const mobileControls = document.getElementById('mobileControls');
-        const rulesModal = document.getElementById('rulesModal');
-        const closeRulesButton = document.getElementById('closeRules');
-        const countdownDisplay = document.getElementById('countdown');
-        const exitFullscreenButton = document.getElementById('exitFullscreenButton');
+        
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const scoreDisplay = document.getElementById('score');
+    const missesDisplay = document.getElementById('misses');
+    const gameOverDisplay = document.getElementById('gameOver');
+    const startButton = document.getElementById('startButton');
+    const pauseButton = document.getElementById('pauseButton');
+    const rulesButton = document.getElementById('rulesButton');
+    const leftButton = document.getElementById('leftButton');
+    const rightButton = document.getElementById('rightButton');
+    const mobileControls = document.getElementById('mobileControls');
+    const rulesModal = document.getElementById('rulesModal');
+    const closeRulesButton = document.getElementById('closeRules');
+    const countdownDisplay = document.getElementById('countdown');
+    const exitFullscreenButton = document.getElementById('exitFullscreenButton');
 
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        resizeCanvas();
-        window.addEventListener('resize', resizeCanvas);
+    // Resizing canvas to fit the window
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
 
-        function toggleMobileControls() {
-            const isMobile = window.innerWidth <= 480;
-            mobileControls.style.display = isMobile ? 'flex' : 'none';
-        }
-        toggleMobileControls();
-        window.addEventListener('resize', toggleMobileControls);
+    // Toggle mobile controls for small screens
+    function toggleMobileControls() {
+        const isMobile = window.innerWidth <= 480;
+        mobileControls.style.display = isMobile ? 'flex' : 'none';
+    }
+    toggleMobileControls();
+    window.addEventListener('resize', toggleMobileControls);
 
-        const car = {
-            width: 50,
-            height: 100,
-            x: canvas.width / 2 - 25,
-            y: canvas.height - 120,
-            speed: 7,
-            moveLeft: false,
-            moveRight: false,
-        };
+    const car = {
+        width: 50,
+        height: 100,
+        x: canvas.width / 2 - 25,
+        y: canvas.height - 120,
+        speed: 7,
+        moveLeft: false,
+        moveRight: false,
+    };
 
-        const obstacles = [];
-        let obstacleSpeed = 5;
-        let obstacleInterval = 2000;
-        let isGameRunning = false;
-        let isPaused = false;
-        let score = 0;
-        let misses = 0;
-        let maxMisses = 20;
-        let lastObstacleTime = 0;
+    const obstacles = [];
+    let obstacleSpeed = 5;
+    let obstacleInterval = 2000;
+    let isGameRunning = false;
+    let isPaused = false;
+    let score = 0;
+    let misses = 0;
+    let maxMisses = 20;
+    let lastObstacleTime = 0;
 
-        function moveCar() {
-            if (car.moveLeft) car.x -= car.speed;
-            if (car.moveRight) car.x += car.speed;
-            if (car.x < 0) car.x = 0;
-            if (car.x + car.width > canvas.width) car.x = canvas.width - car.width;
-        }
+    function moveCar() {
+        if (car.moveLeft) car.x -= car.speed;
+        if (car.moveRight) car.x += car.speed;
+        if (car.x < 0) car.x = 0;
+        if (car.x + car.width > canvas.width) car.x = canvas.width - car.width;
+    }
 
-        function drawCar() {
-            ctx.fillStyle = '#004cff';
-            ctx.fillRect(car.x, car.y, car.width, car.height);
-        }
+    function drawCar() {
+        ctx.fillStyle = 'lightblue';
+        ctx.fillRect(car.x, car.y, car.width, car.height);
+    }
 
-        function drawObstacles() {
+    function drawObstacles() {
+        for (let i = 0; i < obstacles.length; i++) {
+            const obstacle = obstacles[i];
             ctx.fillStyle = 'red';
-            for (let i = 0; i < obstacles.length; i++) {
-                const obstacle = obstacles[i];
-                ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+            ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+
+            // Optionally add shadow or 3D effect for "cubes"
+            if (obstacle.type === 'cube') {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.3)'; // Shadow for cube effect
+                ctx.fillRect(obstacle.x + 10, obstacle.y + 10, obstacle.width, obstacle.height);
             }
         }
+    }
 
-        function generateObstacle() {
-            const width = 50;
-            const x = Math.random() * (canvas.width - width);
-            obstacles.push({
-                x: x,
-                y: -100,
-                width: width,
-                height: 100,
-            });
+    // Function to generate obstacles with random shapes: square, rectangle, and cube
+    function generateObstacle() {
+        const randomShape = Math.random();
+        let width, height, type;
+
+        if (randomShape < 0.33) {
+            // Square
+            width = height = 50 + Math.random() * 50; // Random size between 50 and 100
+            type = 'square';
+        } else if (randomShape < 0.66) {
+            // Rectangle
+            width = 70 + Math.random() * 80; // Random width between 70 and 150
+            height = 30 + Math.random() * 50; // Random height between 30 and 80
+            type = 'rectangle';
+        } else {
+            // Cube (square with 3D effect)
+            width = 50 + Math.random() * 50; // Same size as square
+            height = 50 + Math.random() * 50; // Same size as square
+            type = 'cube';
         }
 
-        function moveObstacles() {
-            const currentTime = performance.now();
-            if (currentTime - lastObstacleTime > obstacleInterval) {
-                generateObstacle();
-                lastObstacleTime = currentTime;
-            }
-            for (let i = 0; i < obstacles.length; i++) {
-                const obstacle = obstacles[i];
-                obstacle.y += obstacleSpeed;
-                if (obstacle.y > canvas.height) {
-                    obstacles.splice(i, 1);
-                    misses++;
-                    updateMissesDisplay();
-                    i--;
-                    if (misses >= maxMisses) {
-                        endGame();
-                    }
+        const x = Math.random() * (canvas.width - width);
+        obstacles.push({
+            x: x,
+            y: -height,
+            width: width,
+            height: height,
+            type: type
+        });
+    }
+
+    function moveObstacles() {
+        const currentTime = performance.now();
+        if (currentTime - lastObstacleTime > obstacleInterval) {
+            generateObstacle();
+            lastObstacleTime = currentTime;
+        }
+        for (let i = 0; i < obstacles.length; i++) {
+            const obstacle = obstacles[i];
+            obstacle.y += obstacleSpeed;
+            if (obstacle.y > canvas.height) {
+                obstacles.splice(i, 1);
+                misses++;
+                updateMissesDisplay();
+                i--;
+                if (misses >= maxMisses) {
+                    endGame();
                 }
             }
         }
+    }
 
-        function detectCollision() {
-            for (let i = 0; i < obstacles.length; i++) {
-                const obstacle = obstacles[i];
-                if (
-                    car.x < obstacle.x + obstacle.width &&
-                    car.x + car.width > obstacle.x &&
-                    car.y < obstacle.y + obstacle.height &&
-                    car.y + car.height > obstacle.y
-                ) {
-                    obstacles.splice(i, 1);
-                    score++;
-                    updateScoreDisplay();
-                    i--;
-                }
+    function detectCollision() {
+        for (let i = 0; i < obstacles.length; i++) {
+            const obstacle = obstacles[i];
+            if (
+                car.x < obstacle.x + obstacle.width &&
+                car.x + car.width > obstacle.x &&
+                car.y < obstacle.y + obstacle.height &&
+                car.y + car.height > obstacle.y
+            ) {
+                obstacles.splice(i, 1);
+                score++;
+                updateScoreDisplay();
+                i--;
+            }
+        }
+    }
+
+    function updateScoreDisplay() {
+        scoreDisplay.textContent = `Score: ${score}`;
+    }
+
+    function updateMissesDisplay() {
+        missesDisplay.textContent = `Misses: ${misses}`;
+    }
+
+    function gameLoop() {
+        if (!isGameRunning || isPaused) return;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        moveCar();
+        moveObstacles();
+        detectCollision();
+        drawCar();
+        drawObstacles();
+        requestAnimationFrame(gameLoop);
+    }
+
+    function startGame() {
+        if (document.fullscreenElement === null) {
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen();
+            } else if (document.documentElement.webkitRequestFullscreen) {
+                document.documentElement.webkitRequestFullscreen();
+            } else if (document.documentElement.msRequestFullscreen) {
+                document.documentElement.msRequestFullscreen();
             }
         }
 
-        function updateScoreDisplay() {
-            scoreDisplay.textContent = `Score: ${score}`;
-        }
+        startButton.style.display = 'none';
+        let countdown = 10;
+        countdownDisplay.textContent = countdown;
+        countdownDisplay.style.display = 'block';
 
-        function updateMissesDisplay() {
-            missesDisplay.textContent = `Misses: ${misses}`;
-        }
+        const countdownInterval = setInterval(() => {
+            countdown--;
+            countdownDisplay.textContent = countdown;
 
-        function gameLoop() {
-            if (!isGameRunning || isPaused) return;
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            moveCar();
-            moveObstacles();
-            detectCollision();
-            drawCar();
-            drawObstacles();
-            requestAnimationFrame(gameLoop);
-        }
-
-        function startGame() {
-            // Request full-screen mode (optional)
-            if (document.fullscreenElement === null) { // Only request if not already in full-screen
-                if (document.documentElement.requestFullscreen) {
-                    document.documentElement.requestFullscreen();
-                } else if (document.documentElement.webkitRequestFullscreen) { /* Safari */
-                    document.documentElement.webkitRequestFullscreen();
-                } else if (document.documentElement.msRequestFullscreen) { /* IE11 */
-                    document.documentElement.msRequestFullscreen();
-                }
+            if (countdown <= 0) {
+                clearInterval(countdownInterval);
+                countdownDisplay.style.display = 'none';
+                isGameRunning = true;
+                resetGame();
+                gameLoop();
             }
+        }, 1000);
+    }
 
-            startButton.style.display = 'none';  // Hide start button
-            let countdown = 10;  // Set countdown to 10 seconds
-            countdownDisplay.textContent = countdown;  // Show the initial countdown
-            countdownDisplay.style.display = 'block';  // Make the countdown visible
+    function resetGame() {
+        isPaused = false;
+        score = 0;
+        misses = 0;
+        obstacleSpeed = 5;
+        obstacles.length = 0;
+        updateScoreDisplay();
+        updateMissesDisplay();
+        gameOverDisplay.style.display = 'none';
+    }
 
-            // Start the countdown interval
-            const countdownInterval = setInterval(() => {
-                countdown--;
-                countdownDisplay.textContent = countdown;
+    function endGame() {
+        isGameRunning = false;
+        gameOverDisplay.style.display = 'block';
+    }
 
-                // When countdown reaches 0, start the game
-                if (countdown <= 0) {
-                    clearInterval(countdownInterval);  // Stop the countdown
-                    countdownDisplay.style.display = 'none';  // Hide the countdown
-                    isGameRunning = true;  // Start the game
-                    resetGame();  // Reset game state
-                    gameLoop();  // Start game loop
-                }
-            }, 1000);  // Update countdown every second
-        }
+    function togglePause() {
+        if (!isGameRunning) return;
+        isPaused = !isPaused;
+        if (!isPaused) gameLoop();
+    }
 
-        function resetGame() {
-            isPaused = false;
-            score = 0;
-            misses = 0;
-            obstacleSpeed = 5;
-            obstacles.length = 0;
-            updateScoreDisplay();
-            updateMissesDisplay();
-            gameOverDisplay.style.display = 'none';
-        }
+    pauseButton.addEventListener('click', togglePause);
 
-        function endGame() {
-            isGameRunning = false;
-            gameOverDisplay.style.display = 'block';
-        }
+    rulesButton.addEventListener('click', () => {
+        rulesModal.style.display = 'block';
+    });
 
-        function togglePause() {
-            if (!isGameRunning) return;
-            isPaused = !isPaused;
-            if (!isPaused) gameLoop();
-        }
+    closeRulesButton.addEventListener('click', () => {
+        rulesModal.style.display = 'none';
+    });
 
-        pauseButton.addEventListener('click', togglePause);
+    startButton.addEventListener('click', startGame);
 
-        rulesButton.addEventListener('click', () => {
-            rulesModal.style.display = 'block';
-        });
-
-        closeRulesButton.addEventListener('click', () => {
-            rulesModal.style.display = 'none';
-        });
-
-        startButton.addEventListener('click', startGame);
-
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowLeft' || e.key === 'a') {
-                car.moveLeft = true;
-            } else if (e.key === 'ArrowRight' || e.key === 'd') {
-                car.moveRight = true;
-            }
-        });
-
-        document.addEventListener('keyup', (e) => {
-            if (e.key === 'ArrowLeft' || e.key === 'a') {
-                car.moveLeft = false;
-            } else if (e.key === 'ArrowRight' || e.key === 'd') {
-                car.moveRight = false;
-            }
-        });
-
-        leftButton.addEventListener('touchstart', () => {
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowLeft' || e.key === 'a') {
             car.moveLeft = true;
-        });
-
-        leftButton.addEventListener('touchend', () => {
-            car.moveLeft = false;
-        });
-
-        rightButton.addEventListener('touchstart', () => {
+        } else if (e.key === 'ArrowRight' || e.key === 'd') {
             car.moveRight = true;
-        });
+        }
+    });
 
-        rightButton.addEventListener('touchend', () => {
+    document.addEventListener('keyup', (e) => {
+        if (e.key === 'ArrowLeft' || e.key === 'a') {
+            car.moveLeft = false;
+        } else if (e.key === 'ArrowRight' || e.key === 'd') {
             car.moveRight = false;
-        });
+        }
+    });
 
-        // Handle full-screen changes
-        document.addEventListener('fullscreenchange', () => {
-            if (!document.fullscreenElement) {
-                console.log("Exited full-screen mode, continuing game in small screen.");
-                // Optionally display a message here or adjust UI for small screen
-            }
-        });
+    leftButton.addEventListener('touchstart', () => {
+        car.moveLeft = true;
+    });
 
-        // Exit Full-Screen Button Event
-        exitFullscreenButton.addEventListener('click', () => {
-            if (document.exitFullscreen) {
-                document.exitFullscreen();
-            } else if (document.webkitExitFullscreen) { /* Safari */
-                document.webkitExitFullscreen();
-            } else if (document.msExitFullscreen) { /* IE11 */
-                document.msExitFullscreen();
-            }
-        });
+    leftButton.addEventListener('touchend', () => {
+        car.moveLeft = false;
+    });
 
+    rightButton.addEventListener('touchstart', () => {
+        car.moveRight = true;
+    });
+
+    rightButton.addEventListener('touchend', () => {
+        car.moveRight = false;
+    });
+
+    document.addEventListener('fullscreenchange', () => {
+        if (!document.fullscreenElement) {
+            console.log("Exited full-screen mode, continuing game in small screen.");
+        }
+    });
+
+    exitFullscreenButton.addEventListener('click', () => {
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+        } else if (document.msExitFullscreen) {
+            document.msExitFullscreen();
+        }
+    });
     </script>
 </body>
 </html>
