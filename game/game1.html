@@ -6,7 +6,7 @@
     <title>BsBlockhiter</title>
     <link rel="icon" type="image/x-icon" href="https://i.ibb.co/gW8Py0B/BS.png">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&family=Orbitron:wght@400..900&family=Red+Hat+Display:ital,wght@0,300..900&family=Strait&display=swap');
+         @import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&family=Orbitron:wght@400..900&family=Red+Hat+Display:ital,wght@0,300..900&family=Strait&display=swap');
         * {
             color: rgb(255, 255, 255);
             font-family: "Red Hat Display", sans-serif;
@@ -179,6 +179,7 @@
 
         }
     </style>
+    </style>
 </head>
 <body>
 
@@ -191,14 +192,11 @@
     </div>
     <button id="startButton">Start Game</button>
     <canvas id="gameCanvas"></canvas>
-    <div class="controls" id="mobileControls" style="
-        display: flex;
-        position: fixed;
-        width: 115%;
-        left: 50%;
-        bottom: 220px;
-        gap: 66px;
-        margin: 0px;
+    <div class="controls" id="mobileControls" style="    display: flex;
+    position: fixed;
+    width: 100%;
+    left: 50%;
+    bottom: 220px;
 ">
         <button id="leftButton" class="button"></button>
         <button id="rightButton" class="button"></button>
@@ -211,7 +209,7 @@
 
     <div id="rulesModal">
         <h2>Game Rules</h2>
-        <p>1. Move your block left and right to hit obstacles.</p>
+        <p>1. Move your car left and right to avoid obstacles.</p>
         <p>2. Score points by hitting obstacles.</p>
         <p>3. You have a maximum of 20 misses. If you exceed this, the game is over!</p>
         <p>4. The game speeds up over time, so stay alert!</p>
@@ -312,22 +310,22 @@
 
     const currentTime = Date.now();
     if (currentTime - lastObstacleTime > obstacleInterval) {
-        const shapeType = Math.random();  
+        const shapeType = Math.random();  // Random number to decide the shape
 
         let obsWidth, obsHeight, isCube;
         
-        
+        // Randomly decide whether it's a square, rectangle, or cube
         if (shapeType < 0.33) {
-            
+            // Square
             obsWidth = obsHeight = 50;
             isCube = false;
         } else if (shapeType < 0.66) {
-            
+            // Rectangle
             obsWidth = 70;
             obsHeight = 40;
             isCube = false;
         } else {
-            
+            // Cube
             obsWidth = obsHeight = 50;
             isCube = true;
         }
@@ -355,24 +353,17 @@
         }
 
         function gameLoop() {
-            if (!isGameRunning) return;
-
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            moveCar();
-            drawCar();
-
-            updateObstacles();
-            drawObstacles();
-
-            
-            checkCollision();
-
-            
-            obstacleSpeed += 0.002;
+            if (isGameRunning && !isPaused) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                moveCar();
+                drawCar();
+                updateObstacles();
+                drawObstacles();
+                checkCollision();
+                obstacleSpeed += 0.002;
             obstacleInterval -= 0.3;
-
-            requestAnimationFrame(gameLoop);
+                requestAnimationFrame(gameLoop);
+            }
         }
 
         function endGame() {
@@ -403,23 +394,25 @@
         }
 
         function startGame() {
-            startButton.style.display = 'none'; 
-            let countdown = 10;
-            countdownDisplay.textContent = countdown; 
-            countdownDisplay.style.display = 'block'; 
+            startButton.style.display = 'none';  // Hide start button
+            let countdown = 10;  // Set countdown to 10 seconds
+            countdownDisplay.textContent = countdown;  // Show the initial countdown
+            countdownDisplay.style.display = 'block';  // Make the countdown visible
 
+            // Start the countdown interval
             const countdownInterval = setInterval(() => {
                 countdown--;
                 countdownDisplay.textContent = countdown;
 
+                // When countdown reaches 0, start the game
                 if (countdown <= 0) {
-                    clearInterval(countdownInterval); 
-                    countdownDisplay.style.display = 'none';  
-                    isGameRunning = true; 
-                    resetGame(); 
-                    gameLoop();
+                    clearInterval(countdownInterval);  // Stop the countdown
+                    countdownDisplay.style.display = 'none';  // Hide the countdown
+                    isGameRunning = true;  // Start the game
+                    resetGame();  // Reset game state
+                    gameLoop();  // Start game loop
                 }
-            }, 1000);
+            }, 1000);  // Update countdown every second
         }
 
         startButton.addEventListener('click', startGame);
