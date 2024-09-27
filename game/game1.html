@@ -137,6 +137,25 @@
             font-weight: bold;
             margin-top: 10px;
         }
+        #mobileControls {
+    display: flex;
+    justify-content: space-between; /* Ensures the buttons are spaced evenly */
+    align-items: center;
+    width: 100%;
+    padding: 0 50px; /* Optional: Adds padding on left and right */
+}
+
+.button {
+    width: 100px; /* Set button width */
+    height: 50px; /* Set button height */
+}
+
+/* For smaller screens, reduce the padding or use a more responsive layout */
+@media (max-width: 600px) {
+    #mobileControls {
+        padding: 0 20px;
+    }
+}
 
         @keyframes fadeIn {
             0% { opacity: 0; }
@@ -161,9 +180,12 @@
     </div>
     <button id="startButton">Start Game</button>
     <canvas id="gameCanvas"></canvas>
-    <div class="controls" id="mobileControls" style="display: flex; gap: 100px; width: 100%;">
-        <button id="leftButton" class="button">Left</button>
-        <button id="rightButton" class="button">Right</button>
+    <div class="controls" id="mobileControls" style="display: flex;
+    position: fixed;
+    width: 100%;
+    left: 220px;">
+        <button id="leftButton" class="button"></button>
+        <button id="rightButton" class="button"></button>
     </div>
 
     <!-- Countdown Display -->
