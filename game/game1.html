@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BsBlockhiter</title>
-    <link rel="icon" type="image/x-icon" href="https://i.ibb.co/gW8Py0B/BS.png">
+    <title>Car Hit Game</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&family=Orbitron:wght@400..900&family=Red+Hat+Display:ital,wght@0,300..900&family=Strait&display=swap');
         * {
@@ -248,48 +247,15 @@
         }
 
         function drawObstacles() {
-    for (let i = 0; i < obstacles.length; i++) {
-        const obs = obstacles[i];
-
-        if (obs.isCube) {
-            drawCube(obs);
-        } else {
-            // Draw rectangle or square
-            const gradient = ctx.createLinearGradient(obs.x, obs.y, obs.x + obs.width, obs.y + obs.height);
-            gradient.addColorStop(0, '#ff1900');
-            gradient.addColorStop(1, '#ff1900');
-            ctx.fillStyle = gradient;
-            ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
+            for (let i = 0; i < obstacles.length; i++) {
+                const obs = obstacles[i];
+                const gradient = ctx.createLinearGradient(obs.x, obs.y, obs.x + obs.width, obs.y + obs.height);
+                gradient.addColorStop(0, '#ff1900');
+                gradient.addColorStop(1, '#ff1900');
+                ctx.fillStyle = gradient;
+                ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
+            }
         }
-    }
-}
-function drawCube(obs) {
-    const depth = 10;
-    
-    // Main square face
-    ctx.fillStyle = '#ff1900';
-    ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
-
-    // Right face
-    ctx.fillStyle = '#d41900';  // Slightly darker shade for 3D effect
-    ctx.beginPath();
-    ctx.moveTo(obs.x + obs.width, obs.y);
-    ctx.lineTo(obs.x + obs.width + depth, obs.y - depth);
-    ctx.lineTo(obs.x + obs.width + depth, obs.y + obs.height - depth);
-    ctx.lineTo(obs.x + obs.width, obs.y + obs.height);
-    ctx.closePath();
-    ctx.fill();
-
-    // Top face
-    ctx.fillStyle = '#e32f00';  // Another darker shade
-    ctx.beginPath();
-    ctx.moveTo(obs.x, obs.y);
-    ctx.lineTo(obs.x + depth, obs.y - depth);
-    ctx.lineTo(obs.x + obs.width + depth, obs.y - depth);
-    ctx.lineTo(obs.x + obs.width, obs.y);
-    ctx.closePath();
-    ctx.fill();
-}
 
         function updateObstacles() {
     for (let i = 0; i < obstacles.length; i++) {
@@ -321,7 +287,12 @@ function drawCube(obs) {
             obsWidth = 70;
             obsHeight = 40;
             isCube = false;
+        } else {
+            // Cube
+            obsWidth = obsHeight = 50;
+            isCube = true;
         }
+
         const obsX = Math.random() * (canvas.width - obsWidth);
         const obsY = -obsHeight;
         obstacles.push({ x: obsX, y: obsY, width: obsWidth, height: obsHeight, isCube: isCube });
