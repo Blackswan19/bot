@@ -19,8 +19,8 @@
 
         canvas {
             display: block;
-    background-color: #181818;
-    touch-action: none;
+            background-color: #181818;
+            touch-action: none;
         }
 
         #score, #misses {
@@ -31,7 +31,7 @@
             padding: 10px;
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
         }
-
+        
         #score {
             top: 10px;
             left: 10px;
@@ -56,28 +56,43 @@
             animation: fadeIn 1s ease-in-out;
         }
 
-        #startButton {
+        #startButton, #pauseButton, #rulesButton {
             position: absolute;
-            top: 50%; /* Moved below the game over text */
-            left: 50%;
-            transform: translate(-50%, -50%);
-            padding: 15px 30px;
-            font-size: 20px;
-            cursor: pointer;
-            background-color: #004cff;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            transition: background-color 0.3s ease, transform 0.3s ease;
-            font-weight: bold;
-            letter-spacing: 1px;
+    padding: 15px 30px;
+    font-size: 15px;
+    cursor: pointer;
+    background-color: #004cff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    letter-spacing: 1px;
         }
 
-        #startButton:hover {
-            background-color: #004cff;
-            transform: translate(-50%, -50%) scale(1.05);
+        #startButton {
+            top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #000645;
+    z-index: 100;
+    white-space: nowrap;
+    height: 100%;
+    width: 100%;
         }
+
+        #pauseButton {
+            top: 100px;
+            left: 10px;
+            background: none;
+        }
+
+        #rulesButton {
+            top: 100px;
+            right: 10px;
+            background: none;
+        }
+
+        
 
         /* Controls for mobile */
         .controls {
@@ -92,19 +107,38 @@
 
         .button {
             background-color: #004cff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            padding: 15px;
-            font-size: 20px;
-            cursor: pointer;
-            flex: 1;
-            margin: 0 5px;
-            transition: background-color 0.3s;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px;
+    font-size: 15px;
+    cursor: pointer;
+    flex: auto;
+    margin: 148px 43px;
+    transition: background-color 0.3s;
         }
 
-        .button:hover {
-            background-color: #004cffa2;
+
+        #rulesModal {
+            position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgb(51 51 51);
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    display: none;
+    z-index: 1000;
+    width: 84%;
+    text-align: center;
+        }
+
+        #closeRules {
+            cursor: pointer;
+            color: #004cff;
+            font-weight: bold;
+            margin-top: 10px;
         }
 
         @keyframes fadeIn {
@@ -125,11 +159,24 @@
     <div id="misses">Misses: 0</div>
     <div id="gameOver">Game Over!<br>Too many misses.</div>
     <button id="startButton">Start Game</button>
+    <button id="pauseButton">Pause</button>
+    <button id="rulesButton">Rules</button>
 
     <canvas id="gameCanvas"></canvas>
-    <div class="controls" id="mobileControls">
+    <div class="controls" id="mobileControls" style="display: flex;
+    gap: 152px;
+    width: 100%;">
         <button id="leftButton" class="button">Left</button>
         <button id="rightButton" class="button">Right</button>
+    </div>
+
+    <div id="rulesModal">
+        <h2>Game Rules</h2>
+        <p>1. Move your car left and right to avoid obstacles.</p>
+        <p>2. Score points by hitting obstacles.</p>
+        <p>3. You have a maximum of 20 misses. If you exceed this, the game is over!</p>
+        <p>4. The game speeds up over time, so stay alert!</p>
+        <span id="closeRules">Close</span>
     </div>
 
     <script>
@@ -139,9 +186,13 @@
         const missesDisplay = document.getElementById('misses');
         const gameOverDisplay = document.getElementById('gameOver');
         const startButton = document.getElementById('startButton');
+        const pauseButton = document.getElementById('pauseButton');
+        const rulesButton = document.getElementById('rulesButton');
         const leftButton = document.getElementById('leftButton');
         const rightButton = document.getElementById('rightButton');
         const mobileControls = document.getElementById('mobileControls');
+        const rulesModal = document.getElementById('rulesModal');
+        const closeRulesButton = document.getElementById('closeRules');
 
         // Set canvas dimensions
         function resizeCanvas() {
@@ -179,6 +230,7 @@
 
         // Game state
         let isGameRunning = false;
+        let isPaused = false; // New pause state
         let score = 0;
         let misses = 0;
         let maxMisses = 20;  // Max allowed misses
@@ -288,7 +340,7 @@
 
         // Game loop
         function gameLoop() {
-            if (!isGameRunning) return;
+            if (!isGameRunning || isPaused) return; // Check if the game is running and not paused
 
             // Clear the canvas
             ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -326,6 +378,22 @@
             gameLoop();
         }
 
+        // Pause game
+        function togglePause() {
+            isPaused = !isPaused; // Toggle pause state
+            pauseButton.textContent = isPaused ? 'Resume' : 'Pause'; // Update button text
+        }
+
+        // Show rules
+        function showRules() {
+            rulesModal.style.display = 'block';
+        }
+
+        // Hide rules
+        function closeRules() {
+            rulesModal.style.display = 'none';
+        }
+
         // Event listeners for arrow keys
         window.addEventListener('keydown', (e) => {
             if (e.key === 'ArrowLeft') car.moveLeft = true;
@@ -356,6 +424,15 @@
 
         // Event listener for start button
         startButton.addEventListener('click', startGame);
+
+        // Event listener for pause button
+        pauseButton.addEventListener('click', togglePause);
+
+        // Event listener for rules button
+        rulesButton.addEventListener('click', showRules);
+
+        // Event listener for close rules button
+        closeRulesButton.addEventListener('click', closeRules);
     </script>
 
 </body>
