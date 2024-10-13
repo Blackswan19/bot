@@ -3,163 +3,265 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Number Sequence Challenge</title>
+    <title>Daily Truck Manager</title>
+    <link rel="icon" type="image/x-icon" href="https://i.pinimg.com/564x/85/20/22/85202263e057b191ff85abe130b19970.jpg">
+    
     <style>
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            height: 100vh;
-            margin: 0;
-            background-color: #f0f0f0;
-            font-family: Arial, sans-serif;
-        }
-
-        #numberDisplay {
-            font-size: 3em;
-            margin: 20px;
-        }
-
-        #numberInput {
-            display: flex;
-            gap: 10px;
-        }
-
-        #numberInput input {
-            width: 50px;
-            height: 50px;
-            font-size: 2em;
-            text-align: center;
-        }
-
-        #status {
-            margin: 20px;
-            font-size: 1.5em;
-        }
-
-        #startButton {
-            padding: 10px 20px;
-            font-size: 1.2em;
-        }
+        body { font-family: Arial, sans-serif; } .container { display: flex; justify-content: space-around; margin: 20px; } .panel { border: 2px solid #000; padding: 50px; background-color: #ffffff; max-height: 600px; overflow: auto; max-width: 25%; } .button { padding: 8px; margin: 5px 0; background-color: lightblue; cursor: pointer; } .button:disabled { background-color: gray; cursor: not-allowed; } .status { font-weight: bold; color: green; } .busy { color: red; } .contract-list { overflow-y: auto; } .map { margin-top: 20px; } /* Modal styles */ .modal { display: none; /* Hidden by default */ position: fixed; /* Stay in place */ z-index: 1; /* Sit on top */ left: 0; top: 0; width: 100%; /* Full width */ height: 100%; /* Full height */ overflow: auto; /* Enable scroll if needed */ background-color: rgb(0,0,0); /* Fallback color */ background-color: rgba(0,0,0,0.4); /* Black w/ opacity */ } .modal-content { background-color: #fefefe; margin: 15% auto; /* 15% from the top and centered */ padding: 20px; border: 1px solid #888; width: 80%; /* Could be more or less, depending on screen size */ } .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; } .close:hover, .close:focus { color: black; text-decoration: none; cursor: pointer; } @media (max-width: 600px) { body { padding: 10px; } h1 { font-size: 24px; text-align: center; } .container { flex-direction: column; align-items: center; } .panel { padding: 15px; margin-bottom: 15px; max-width: 100%; } .button { padding: 10px; font-size: 14px; width: 100%; } .contract-list { max-height: 150px; } .map { margin-top: 5px; } .panel img { width: 100%; /* Make images take the full width of the panel */ } .modal-content { width: 90%; font-size: 14px; } .close { font-size: 24px; } /* Adjust balance and driver count for better spacing */ #balance, #driverCount { font-size: 16px; } .panel h3, .panel h4 { font-size: 20px; } }
     </style>
 </head>
 <body>
-
-    <div id="numberDisplay">Get Ready!</div>
-
-    <div id="numberInput"></div>
-
-    <div id="status"></div>
-
-    <button id="startButton">Start Game</button>
-
+   <h1 style="font-size: 20px;">BsDtm</h1> <div class="container"> <!-- My Company Panel --> <div class="panel"> <h1>My Company</h1> <p>Balance: <span id="balance">$1000</span></p> <img src="https://i.pinimg.com/564x/55/17/5f/55175fb4d1fb60577666a58d6c3c2a4b.jpg" alt="" width="50%"> <p>Available Trucks: <span id="truckCount">0</span></p> <button class="button" id="buyTruckBtn" onclick="buyTruck()">Buy Truck ($1500)</button> <button class="button" id="leaseTruckBtn" onclick="leaseTruck()">Lease Truck ($900)</button> <h4>Drivers</h4> <img src="https://static.vecteezy.com/system/resources/previews/026/615/562/non_2x/truck-driver-icon-isolated-on-white-background-vector.jpg" alt="" width="35%"> <p>Total Drivers: <span id="driverCount">0</span></p> <button class="button" onclick="hireDriver()">Hire Driver ($200)</button> </div> <!-- Contracts Panel --> <div class="panel"> <h3>Contracts</h3> <div class="contract-list" id="contractList"> <!-- Contracts will be dynamically added here --> </div> </div> <!-- Trucks Status Panel --> <div class="panel" id="truckStatusPanel"> <h3>Trucks Status</h3> </div> </div>
     <script>
-        const numberDisplay = document.getElementById('numberDisplay');
-        const numberInputDiv = document.getElementById('numberInput');
-        const statusDiv = document.getElementById('status');
-        const startButton = document.getElementById('startButton');
+        let balance = 1000;
+        let trucks = [];
+        let drivers = 0; // Track number of hired drivers
+        let maxContracts = 30;
 
-        let numberSequence = [];
-        let userSequence = [];
-        let currentLevel = 1;
-        let lives = 3;
-        let displayTime = 1000;
-
-        // Generate a random number between 0 and 9
-        function getRandomNumber() {
-            return Math.floor(Math.random() * 10);
+        // Update the balance on the page
+        function updateBalance() {
+            document.getElementById('balance').innerText = `$${balance}`;
         }
 
-        // Display the number sequence to the player
-        function showNumberSequence() {
-            numberInputDiv.innerHTML = ''; // Clear input
-            userSequence = []; // Clear user sequence
-            let index = 0;
-            numberDisplay.textContent = numberSequence[index];
-
-            const intervalId = setInterval(() => {
-                index++;
-                if (index < numberSequence.length) {
-                    numberDisplay.textContent = numberSequence[index];
-                } else {
-                    clearInterval(intervalId);
-                    numberDisplay.textContent = 'Enter the sequence!';
-                    createNumberInputs();
-                }
-            }, displayTime);
+        // Update the number of drivers on the page
+        function updateDriverCount() {
+            document.getElementById('driverCount').innerText = drivers;
+            updateTruckButtons();
         }
 
-        // Create input fields for user to enter the sequence
-        function createNumberInputs() {
-            numberInputDiv.innerHTML = '';
-            for (let i = 0; i < numberSequence.length; i++) {
-                const input = document.createElement('input');
-                input.type = 'number';
-                input.maxLength = 1;
-                input.addEventListener('input', handleInputChange);
-                numberInputDiv.appendChild(input);
-            }
+        // Update the truck count and buttons
+        function updateTruckCount() {
+            const truckCount = trucks.length;
+            document.getElementById('truckCount').innerText = truckCount;
+            updateTruckButtons();
         }
 
-        // Handle user input
-        function handleInputChange(event) {
-            const inputs = document.querySelectorAll('#numberInput input');
-            userSequence = Array.from(inputs).map(input => parseInt(input.value));
-
-            if (userSequence.length === numberSequence.length && !userSequence.includes(NaN)) {
-                checkUserSequence();
-            }
-        }
-
-        // Check if the user input matches the number sequence
-        function checkUserSequence() {
-            const isCorrect = numberSequence.every((num, idx) => num === userSequence[idx]);
-
-            if (isCorrect) {
-                statusDiv.textContent = `Correct! Level ${currentLevel + 1} starting...`;
-                setTimeout(nextLevel, 1000);
+        // Update truck buttons based on the number of drivers and trucks
+        function updateTruckButtons() {
+            const buyTruckBtn = document.getElementById('buyTruckBtn');
+            const leaseTruckBtn = document.getElementById('leaseTruckBtn');
+            
+            if (trucks.length >= drivers) {
+                buyTruckBtn.disabled = true;
+                leaseTruckBtn.disabled = true;
             } else {
-                lives--;
-                statusDiv.textContent = `Wrong! Lives remaining: ${lives}`;
-                if (lives === 0) {
-                    statusDiv.textContent = 'Game Over! Click Start to play again.';
-                    resetGame();
-                }
+                buyTruckBtn.disabled = false;
+                leaseTruckBtn.disabled = false;
             }
         }
 
-        // Move to the next level
-        function nextLevel() {
-            currentLevel++;
-            numberSequence.push(getRandomNumber());
-            showNumberSequence();
+        // Update truck status
+        function updateTruckStatus(truckId, status) {
+            const truckIndex = trucks.findIndex(truck => truck.id === truckId);
+            trucks[truckIndex].available = (status === 'Available');
+            document.getElementById(`truck${truckId}Status`).innerText = status;
+            document.getElementById(`truck${truckId}Status`).className = status === 'Available' ? 'status' : 'status busy';
         }
 
-        // Start the game
-        function startGame() {
-            currentLevel = 1;
-            lives = 3;
-            numberSequence = Array.from({ length: currentLevel }, getRandomNumber);
-            statusDiv.textContent = `Level 1 - Lives: ${lives}`;
-            showNumberSequence();
+        // Clear the truck route
+        function clearRoute(truckId) {
+            const canvas = document.getElementById(`truck${truckId}Map`);
+            const context = canvas.getContext('2d');
+            context.clearRect(0, 0, canvas.width, canvas.height);
         }
 
-        // Reset the game
-        function resetGame() {
-            startButton.disabled = false;
-            numberDisplay.textContent = 'Get Ready!';
-            numberInputDiv.innerHTML = '';
-            numberSequence = [];
-            userSequence = [];
+        // Add a truck to the game
+        function addTruck() {
+            const truckId = trucks.length + 1;
+            trucks.push({ id: truckId, available: true, trips: 0, route: 'None', x: 10, y: 190 });
+
+            // Add truck status panel
+            const truckStatusPanel = document.getElementById('truckStatusPanel');
+            const truckDiv = document.createElement('div');
+            truckDiv.id = `truck${truckId}Panel`;
+            truckDiv.innerHTML = `
+                <p>Truck ${truckId}: <span id="truck${truckId}Status" class="status">Available</span></p>
+                <div class="map" onclick="showMap(${truckId})">
+                    <canvas id="truck${truckId}Map" width="200" height="200" style="border: 1px solid black;"></canvas>
+                </div>
+            `;
+            truckStatusPanel.appendChild(truckDiv);
+            updateTruckCount(); // Update truck count display
         }
 
-        // Event listener for start button
-        startButton.addEventListener('click', () => {
-            startButton.disabled = true;
-            startGame();
-        });
+        // Buy a truck
+        function buyTruck() {
+            if (balance >= 1500) {
+                balance -= 1500;
+                updateBalance();
+                addTruck();
+                
+            } else {
+    
+            }
+        }
+
+        // Lease a truck
+        function leaseTruck() {
+            if (balance >= 900) {
+                balance -= 900;
+                updateBalance();
+                addTruck();
+            } else {
+                
+            }
+        }
+
+        // Hire a driver
+        function hireDriver() {
+            if (balance >= 400) {
+                balance -= 400;
+                drivers++;
+                updateBalance();
+                updateDriverCount();
+                
+            } else {
+                
+            }
+        }
+
+        // Generate contracts dynamically (up to maxContracts)
+        function generateContracts() {
+            const contractList = document.getElementById('contractList');
+            for (let i = 1; i <= maxContracts; i++) {
+                const contractDiv = document.createElement('div');
+                const destination = `Location ${i}`;
+                const amount = Math.floor(Math.random() * 850) + 162; // Random amount between $100 and $600
+                const distance = Math.floor(Math.random() * 290) + 10; // Random distance between 10 and 300 km
+
+                // Set base delivery time to 15 minutes (900000 milliseconds)
+                const baseTime = 150000; 
+                const randomDelay = Math.floor(Math.random() * 30000); // Random additional time (0 to 30 seconds)
+                const totalTime = baseTime + randomDelay;
+
+                contractDiv.innerHTML = `
+                    <p>${i}. ${destination} = ${distance} km - $${amount}</p>
+                    <button class="button" onclick="takeContract('${destination}', ${amount}, ${distance}, ${totalTime})">Take Contract</button>
+                `;
+                contractList.appendChild(contractDiv);
+            }
+        }
+
+        // Take a contract
+        function takeContract(destination, amount, distance, time) {
+            const availableTrucks = trucks.filter(truck => truck.available);
+            if (availableTrucks.length === 0) {
+                alert('No available trucks to take this contract!');
+                return;
+            }
+
+            const selectedTruck = availableTrucks[0]; // Use the first available truck
+            selectedTruck.route = destination;
+
+            updateTruckStatus(selectedTruck.id, 'Busy');
+            moveTruck(selectedTruck.id, destination, time, distance, amount);
+        }
+
+        // Move the truck along the defined path
+        function moveTruck(truckId, destination, time, distance, amount) {
+            const truck = trucks.find(t => t.id === truckId);
+            const canvas = document.getElementById(`truck${truckId}Map`);
+            const context = canvas.getContext('2d');
+
+            // Starting and destination points
+            const startX = truck.x;
+            const startY = truck.y;
+            const destX = Math.min(startX + distance * 2, canvas.width - 10);
+            const destY = Math.random() * (canvas.height - 20);
+            const controlX = (startX + destX) / 2 + (Math.random() * 100 - 50);
+            const controlY = (startY + destY) / 2 + (Math.random() * 100 - 50);
+            
+            // Draw the path on the canvas
+            context.beginPath();
+            context.moveTo(startX, startY);
+            context.quadraticCurveTo(controlX, controlY, destX, destY);
+            context.strokeStyle = 'blue';
+            context.stroke();
+
+            let startTime = null;
+            let currentDistance = 0; // Track the distance covered during movement
+
+            function animate(timestamp) {
+                if (!startTime) startTime = timestamp;
+                const elapsed = timestamp - startTime;
+
+                const t = Math.min(1, elapsed / time);
+
+                const x = (1 - t) ** 2 * startX + 2 * (1 - t) * t * controlX + t ** 2 * destX;
+                const y = (1 - t) ** 2 * startY + 2 * (1 - t) * t * controlY + t ** 2 * destY;
+
+                clearRoute(truckId);
+                context.beginPath();
+                context.moveTo(startX, startY);
+                context.quadraticCurveTo(controlX, controlY, destX, destY);
+                context.strokeStyle = 'blue';
+                context.stroke();
+
+                context.beginPath();
+                context.arc(x, y, 5, 0, 2 * Math.PI);
+                context.fillStyle = 'red';
+                context.fill();
+
+                // Update distance on the truck's canvas
+                currentDistance = Math.round((t * distance));
+                context.fillStyle = 'black';
+                context.font = '12px Arial';
+                context.fillText(`${currentDistance} km`, x, y - 10);
+
+                if (t < 1) {
+                    requestAnimationFrame(animate);
+                } else {
+                    truck.x = destX;
+                    truck.y = destY;
+                    updateTruckStatus(truckId, 'Available');
+                    balance += amount;
+                    updateBalance();
+
+                    truck.trips++; // Increment trips
+                    if (truck.trips > 10) {
+                        sendToRepair(truckId); // Send truck to repair if trips exceed 10
+                    }
+                }
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        // Send truck to repair
+        function sendToRepair(truckId) {
+            alert(`Truck ${truckId} has completed more than 10 trips and needs repairs!`);
+            const truck = trucks.find(t => t.id === truckId);
+            truck.available = false;
+
+            // Stop the truck's movement on the map
+            clearRoute(truckId);
+
+            // Simulate repair time
+            setTimeout(() => {
+                truck.trips = 0; // Reset trips after repair
+                truck.available = true;
+                updateTruckStatus(truckId, 'Available');
+                alert(`Truck ${truckId} has been repaired and is back in service!`);
+            }, 30000); // Repair takes 30 seconds
+        }
+
+        // Show map modal
+        function showMap(truckId) {
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <span class="close" onclick="this.parentElement.parentElement.style.display='none'">&times;</span>
+                    <h3>Truck ${truckId} is in transit and will reach the destination soon.</h3>
+                    <img src="https://i.pinimg.com/564x/40/38/0b/40380b3f43f597536aa69c0a97dbd9c1.jpg" alt="" width="20%">
+                </div>
+            `;
+            document.body.appendChild(modal);
+            modal.style.display = 'block';
+        }
+
+        // Initialize the game
+        generateContracts();
     </script>
-
 </body>
 </html>
