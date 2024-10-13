@@ -7,17 +7,17 @@
     <link rel="icon" type="image/x-icon" href="https://i.pinimg.com/564x/85/20/22/85202263e057b191ff85abe130b19970.jpg">
     
     <style>
-       body { font-family: Arial, sans-serif; } .container { display: flex; justify-content: space-around; margin: 20px; } .panel { border: 2px solid #000; padding: 50px; background-color: #ffffff; max-height: 610px; overflow: auto; max-width: 25%; } .button { padding: 8px; margin: 5px 0; background-color: lightblue; cursor: pointer; } .button:disabled { background-color: gray; cursor: not-allowed; } .status { font-weight: bold; color: green; } .busy { color: red; } .contract-list { overflow-y: auto; } .map { margin-top: 20px; } /* Modal styles */ .modal { display: none; /* Hidden by default */ position: fixed; /* Stay in place */ z-index: 1; /* Sit on top */ left: 0; top: 0; width: 100%; /* Full width */ height: 100%; /* Full height */ overflow: auto; /* Enable scroll if needed */ background-color: rgba(0, 0, 0, 0.71); /* Fallback color */ } .modal-content { background-color: #ffffff; margin: 15% auto; /* 15% from the top and centered */ padding: 20px; width: 80%; border-radius: 10px; } .modal-content h3{ color: rgb(0 0 0); position: absolute; font-size: 30px; left: 30%; top: 310px; } .close { color: #000000; float: right; font-size: 28px; font-weight: bold; } .close:hover, .close:focus { color: rgb(0, 81, 255); text-decoration: none; cursor: pointer; } @media (max-width: 600px) { body { padding: 10px; } h1 { font-size: 24px; text-align: center; } .container { flex-direction: column; align-items: center; } .panel { padding: 15px; margin-bottom: 15px; max-width: 100%; width: 90%; max-height: 45vh; } .button { padding: 10px; font-size: 14px; width: 100%; } .contract-list { max-height: 350px; } .map { margin-top: 5px; } .panel img { width: 100%; /* Make images take the full width of the panel */ } .modal-content { width: 65%; font-size: 14px; margin: 70% auto; } .modal-content h3 {color: rgb(0 0 0); position: static; font-size: 18px; text-align: center;} .close { font-size: 24px; } /* Adjust balance and driver count for better spacing */ #balance, #driverCount { font-size: 16px; } .panel h3, .panel h4 { font-size: 20px; } }
+       body { font-family: Arial, sans-serif; } .container { display: flex; justify-content: space-around; margin: 20px; } .panel { border: 2px solid #000; padding: 50px; background-color: #ffffff; max-height: 535px; overflow: auto; max-width: 25%; width: 100%; text-align: center; } .button { padding: 8px; margin: 5px 0; background-color: lightblue; cursor: pointer; } .button:disabled { background-color: gray; cursor: not-allowed; } .status { font-weight: bold; color: green; } .busy { color: red; } .contract-list { overflow-y: auto; max-height: 365px; } .map { margin-top: 20px; } /* Modal styles */ .modal { display: none; /* Hidden by default */ position: fixed; /* Stay in place */ z-index: 1; /* Sit on top */ left: 0; top: 0; width: 100%; /* Full width */ height: 100%; /* Full height */ overflow: auto; /* Enable scroll if needed */ background-color: rgba(0, 0, 0, 0.71); /* Fallback color */ } .modal-content { background-color: #ffffff; margin: 15% auto; /* 15% from the top and centered */ padding: 20px; width: 80%; border-radius: 10px; } .modal-content h3 { color: rgb(0 0 0); position: absolute; font-size: 30px; left: 30%; top: 310px; } .close { color: #000000; float: right; font-size: 28px; font-weight: bold; } .close:hover, .close:focus { color: rgb(0, 81, 255); text-decoration: none; cursor: pointer; } .basedon { text-align: center; position: relative; bottom: 0px; } @media (max-width: 600px) { body { padding: 10px; } h1 { font-size: 24px; text-align: center; } .container { flex-direction: column; align-items: center; } .panel { padding: 15px; margin-bottom: 15px; max-width: 100%; width: 90%; max-height: 44vh; } .button { padding: 10px; font-size: 14px; width: 100%; } .contract-list { max-height: 220px; } .map { margin-top: 5px; } .panel img { width: 100%; /* Make images take the full width of the panel */ } .modal-content { width: 65%; font-size: 14px; margin: 70% auto; } .modal-content h3 { color: rgb(0 0 0); position: static; font-size: 18px; text-align: center; } .close { font-size: 24px; } /* Adjust balance and driver count for better spacing */ #balance, #driverCount { font-size: 16px; } .panel h3, .panel h4 { font-size: 20px; } }
     </style>
 </head>
 <body>
-    <h1 style="font-size: 20px;">BsDtm</h1> <div class="container"> <!-- My Company Panel --> <div class="panel"> <h1>My Company</h1> <p>Balance: <span id="balance">$1000</span></p> <img src="https://i.pinimg.com/564x/55/17/5f/55175fb4d1fb60577666a58d6c3c2a4b.jpg" alt="" width="50%"> <p>Available Trucks: <span id="truckCount">0</span></p> <button class="button" id="buyTruckBtn" onclick="buyTruck()">Buy Truck ($1500)</button> <button class="button" id="leaseTruckBtn" onclick="leaseTruck()">Lease Truck ($900)</button> <h4>Drivers</h4> <img src="https://static.vecteezy.com/system/resources/previews/026/615/562/non_2x/truck-driver-icon-isolated-on-white-background-vector.jpg" alt="" width="35%"> <p>Total Drivers: <span id="driverCount">0</span></p> <button class="button" onclick="hireDriver()">Hire Driver ($200)</button> </div> <!-- Contracts Panel --> <div class="panel"> <h1>Contracts</h1> <div class="contract-list" id="contractList"> <!-- Contracts will be dynamically added here --> </div> </div> <!-- Trucks Status Panel --> <div class="panel" id="truckStatusPanel"> <h1>Trucks Status</h1> </div> </div>
-
+    <h1 style="font-size: 20px;">BsDtm</h1> <div class="basedon"> <button class="button" onclick="saveGame()">Save Game</button> <button class="button" onclick="loadGame()">Load Game</button> </div> <div class="container"> <!-- My Company Panel --> <div class="panel"> <h1>My Company</h1> <p>Balance: <span id="balance">$1000</span></p> <img src="https://i.pinimg.com/564x/55/17/5f/55175fb4d1fb60577666a58d6c3c2a4b.jpg" alt="" width="50%"> <p>Available Trucks: <span id="truckCount">0</span></p> <button class="button" id="buyTruckBtn" onclick="buyTruck()">Buy Truck ($1500)</button> <button class="button" id="leaseTruckBtn" onclick="leaseTruck()">Lease Truck ($900)</button> <h4>Drivers</h4> <img src="https://static.vecteezy.com/system/resources/previews/026/615/562/non_2x/truck-driver-icon-isolated-on-white-background-vector.jpg" alt="" width="35%"> <p>Total Drivers: <span id="driverCount">0</span></p> <button class="button" onclick="hireDriver()">Hire Driver ($200)</button> </div> <!-- Contracts Panel --> <div class="panel"> <h1>Contracts</h1> <div class="contract-list" id="contractList"> <!-- Contracts will be dynamically added here --> </div> <button class="button" id="loadNewContractsBtn" onclick="loadNewContracts()">Load New Contracts</button> </div> <!-- Trucks Status Panel --> <div class="panel" id="truckStatusPanel"> <h1>Trucks Status</h1> </div> </div>
     <script>
         let balance = 1000;
         let trucks = [];
         let drivers = 0; // Track number of hired drivers
         let maxContracts = 30;
+        let currentContracts = [];
 
         // Update the balance on the page
         function updateBalance() {
@@ -82,7 +82,7 @@
                 </div>
             `;
             truckStatusPanel.appendChild(truckDiv);
-            updateTruckCount(); // Update truck count display
+            updateTruckCount(); // Update truck count on the panel
         }
 
         // Buy a truck
@@ -91,9 +91,8 @@
                 balance -= 1500;
                 updateBalance();
                 addTruck();
-                
             } else {
-    
+                alert("Not enough balance to buy a truck!");
             }
         }
 
@@ -104,29 +103,31 @@
                 updateBalance();
                 addTruck();
             } else {
-                
+                alert("Not enough balance to lease a truck!");
             }
         }
 
         // Hire a driver
         function hireDriver() {
-            if (balance >= 400) {
-                balance -= 400;
+            if (balance >= 200) {
+                balance -= 200;
                 drivers++;
                 updateBalance();
                 updateDriverCount();
-                
             } else {
-                
+                alert("Not enough balance to hire a driver!");
             }
         }
 
         // Generate contracts dynamically (up to maxContracts)
         function generateContracts() {
             const contractList = document.getElementById('contractList');
-            for (let i = 1; i <= maxContracts; i++) {
+            contractList.innerHTML = ''; // Clear existing contracts
+            currentContracts = [];
+
+            for (let i = 1; i <= 10; i++) { // Only generate 10 contracts
                 const contractDiv = document.createElement('div');
-                const destination = `Location ${i}`;
+                const destination = `Location ${Math.floor(Math.random() * maxContracts) + 1}`;
                 const amount = Math.floor(Math.random() * 850) + 162; // Random amount between $100 and $600
                 const distance = Math.floor(Math.random() * 290) + 10; // Random distance between 10 and 300 km
 
@@ -136,15 +137,21 @@
                 const totalTime = baseTime + randomDelay;
 
                 contractDiv.innerHTML = `
-                    <p>${i}. ${destination} = ${distance} km - $${amount}</p>
-                    <button class="button" onclick="takeContract('${destination}', ${amount}, ${distance}, ${totalTime})">Take Contract</button>
+                    <p>${destination} = ${distance} km - $${amount}</p>
+                    <button class="button" onclick="takeContract('${destination}', ${amount}, ${distance}, ${totalTime}, this)">Take Contract</button>
                 `;
                 contractList.appendChild(contractDiv);
+                currentContracts.push({ destination, amount, distance, totalTime });
             }
         }
 
+        // Load new contracts
+        function loadNewContracts() {
+            generateContracts();
+        }
+
         // Take a contract
-        function takeContract(destination, amount, distance, time) {
+        function takeContract(destination, amount, distance, time, button) {
             const availableTrucks = trucks.filter(truck => truck.available);
             if (availableTrucks.length === 0) {
                 alert('No available trucks to take this contract!');
@@ -156,6 +163,10 @@
 
             updateTruckStatus(selectedTruck.id, 'Busy');
             moveTruck(selectedTruck.id, destination, time, distance, amount);
+
+            // Disable the button of the taken contract
+            button.disabled = true;
+            button.innerText = "Contract Taken";
         }
 
         // Move the truck along the defined path
@@ -259,6 +270,55 @@
             `;
             document.body.appendChild(modal);
             modal.style.display = 'block';
+        }
+
+        // Save game state
+        function saveGame() {
+            const gameState = {
+                balance: balance,
+                trucks: trucks,
+                drivers: drivers,
+                currentContracts: currentContracts // Save current contracts
+            };
+            localStorage.setItem('truckManagerGame', JSON.stringify(gameState));
+            alert("Game saved!");
+        }
+
+        // Load game state
+        function loadGame() {
+            const savedGame = localStorage.getItem('truckManagerGame');
+            if (savedGame) {
+                const gameState = JSON.parse(savedGame);
+                balance = gameState.balance;
+                trucks = gameState.trucks;
+                drivers = gameState.drivers;
+                currentContracts = gameState.currentContracts || [];
+
+                updateBalance();
+                updateDriverCount();
+                updateTruckCount();
+                updateTruckStatusPanel();
+                generateContracts(); // Generate contracts based on saved state
+                alert("Game loaded!");
+            } else {
+                alert("No saved game found.");
+            }
+        }
+
+        // Update the truck status panel
+        function updateTruckStatusPanel() {
+            const truckStatusPanel = document.getElementById('truckStatusPanel');
+            truckStatusPanel.innerHTML = `<h3>Trucks Status</h3>`; // Clear existing content
+            trucks.forEach(truck => {
+                const truckDiv = document.createElement('div');
+                truckDiv.innerHTML = `
+                    <p>Truck ${truck.id}: <span id="truck${truck.id}Status" class="${truck.available ? 'status' : 'status busy'}">${truck.available ? 'Available' : 'Busy'}</span></p>
+                    <div class="map" onclick="showMap(${truck.id})">
+                        <canvas id="truck${truck.id}Map" width="200" height="200" style="border: 1px solid black;"></canvas>
+                    </div>
+                `;
+                truckStatusPanel.appendChild(truckDiv);
+            });
         }
 
         // Initialize the game
