@@ -87,8 +87,8 @@
 
         // Buy a truck
         function buyTruck() {
-            if (balance >= 1500) {
-                balance -= 1500;
+            if (balance >= 10000) {
+                balance -= 10000;
                 updateBalance();
                 addTruck();
             } else {
@@ -98,8 +98,8 @@
 
         // Lease a truck
         function leaseTruck() {
-            if (balance >= 900) {
-                balance -= 900;
+            if (balance >= 5000) {
+                balance -= 5000;
                 updateBalance();
                 addTruck();
             } else {
@@ -109,8 +109,8 @@
 
         // Hire a driver
         function hireDriver() {
-            if (balance >= 200) {
-                balance -= 200;
+            if (balance >= 900) {
+                balance -= 900;
                 drivers++;
                 updateBalance();
                 updateDriverCount();
