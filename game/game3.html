@@ -3,188 +3,155 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Color Pattern Memory</title>
+    <title>Addition Game</title>
     <style>
         body {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f5f5f5;
             font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+            background-color: #000000;
+            color: white;
         }
+        input{
+            padding: 10px;
 
-        #grid {
-            display: grid;
-            grid-template-columns: repeat(3, 100px);
-            grid-template-rows: repeat(3, 100px);
-            gap: 10px;
         }
-
-        .cell {
-            width: 100px;
-            height: 100px;
-            background-color: lightgray;
-            border: 2px solid #333;
-            cursor: pointer;
-            transition: background-color 0.3s;
+        #game-container {
+            padding: 50px;
+            border: 2px solid #ccc;
+            display: inline-block;
+            border-radius: 10px;
+            background: #232323;
         }
-
-        #status {
-            margin-top: 20px;
-            font-size: 1.5em;
-        }
-
-        #startButton {
-            margin-top: 20px;
+        button, select {
+            color: white;
+            margin-top: 10px;
             padding: 10px 20px;
-            font-size: 1.2em;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: rgb(20, 20, 20);
         }
-
+        #feedback {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        #timer {
+            font-size: 20px;
+            color: #ff0000;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
-
-    <div id="grid"></div>
-    <div id="status">Press Start to Begin</div>
-    <button id="startButton">Start Game</button>
+    <div id="game-container">
+        <h1>Addition Game</h1>
+        <label for="difficulty">Select Difficulty:</label>
+        <select id="difficulty" onchange="resetGame()">
+            <option value="easy">Easy</option>
+            <option value="medium">Medium</option>
+            <option value="hard">Hard</option>
+        </select>
+        <p id="question">Click "Start Game" to begin!</p>
+        <input type="number" id="answer" placeholder="Your answer" />
+        <br />
+        <button onclick="checkAnswer()">Submit Answer</button>
+        <button onclick="generateQuestion()">Next Question</button>
+        <p id="timer"></p>
+        <p id="feedback"></p>
+    </div>
 
     <script>
-        const grid = document.getElementById('grid');
-        const statusDiv = document.getElementById('status');
-        const startButton = document.getElementById('startButton');
-        const gridSize = 9; // 3x3 grid
-        let pattern = [];
-        let playerPattern = [];
-        let currentLevel = 1;
-        let lives = 3;
-        let showingPattern = false;
+        let num1, num2;
+        let difficulty = 'easy'; // Default difficulty
+        let timer;
+        let timeLeft;
 
-        // Create a 3x3 grid of cells
-        function createGrid() {
-            grid.innerHTML = '';
-            for (let i = 0; i < gridSize; i++) {
-                const cell = document.createElement('div');
-                cell.classList.add('cell');
-                cell.dataset.index = i;
-                cell.addEventListener('click', handleCellClick);
-                grid.appendChild(cell);
+        // Get timer duration based on difficulty
+        function getTimerDuration() {
+            if (difficulty === 'easy') {
+                return 25; // 15 seconds for easy
+            } else if (difficulty === 'medium') {
+                return 20; // 10 seconds for medium
+            } else if (difficulty === 'hard') {
+                return 15; // 5 seconds for hard
             }
         }
 
-        // Handle clicks on the grid cells
-        function handleCellClick(event) {
-            if (showingPattern) return; // Disable clicking while showing pattern
-            const index = parseInt(event.target.dataset.index);
-
-            playerPattern.push(index);
-            highlightCell(index, '#8fbc8f'); // Temporary highlight to show user click
-
-            setTimeout(() => {
-                resetCell(index); // Reset color back after 300ms
-            }, 300);
-
-            if (playerPattern.length === pattern.length) {
-                checkPlayerPattern();
-            }
-        }
-
-        // Highlight the selected cell
-        function highlightCell(index, color) {
-            const cell = document.querySelector(`.cell[data-index='${index}']`);
-            cell.style.backgroundColor = color;
-        }
-
-        // Reset the cell to its default color
-        function resetCell(index) {
-            const cell = document.querySelector(`.cell[data-index='${index}']`);
-            cell.style.backgroundColor = 'lightgray';
-        }
-
-        // Check if the player's pattern matches the game's pattern
-        function checkPlayerPattern() {
-            const isCorrect = pattern.every((num, idx) => num === playerPattern[idx]);
-
-            if (isCorrect) {
-                statusDiv.textContent = `Correct! Moving to level ${currentLevel + 1}`;
-                setTimeout(nextLevel, 1000);
-            } else {
-                lives--;
-                statusDiv.textContent = `Wrong! Lives remaining: ${lives}`;
-                if (lives === 0) {
-                    statusDiv.textContent = 'Game Over! Click Start to play again.';
-                    resetGame();
+        // Start the timer
+        function startTimer() {
+            timeLeft = getTimerDuration();
+            document.getElementById('timer').innerText = `Time left: ${timeLeft}s`;
+            timer = setInterval(() => {
+                timeLeft--;
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    document.getElementById('timer').innerText = 'Time’s up!';
+                    document.getElementById('feedback').innerText = 'Time’s up! You didn’t answer in time.';
+                    document.getElementById('feedback').style.color = 'red';
+                } else {
+                    document.getElementById('timer').innerText = `Time left: ${timeLeft}s`;
                 }
+            }, 1000);
+        }
+
+        // Stop the timer
+        function stopTimer() {
+            clearInterval(timer);
+            document.getElementById('timer').innerText = '';
+        }
+
+        // Generate a new question
+        function generateQuestion() {
+            stopTimer(); // Reset the timer for the new question
+            const range = getRange();
+            num1 = Math.floor(Math.random() * (range.max - range.min + 1)) + range.min;
+            num2 = Math.floor(Math.random() * (range.max - range.min + 1)) + range.min;
+            document.getElementById('question').innerText = `What is ${num1} + ${num2}?`;
+            document.getElementById('answer').value = ''; // Clear the input field
+            document.getElementById('feedback').innerText = ''; // Clear feedback
+            startTimer(); // Start the timer for the new question
+        }
+
+        // Adjust the range of numbers based on difficulty
+        function getRange() {
+            if (difficulty === 'easy') {
+                return { min: 1, max: 10 }; // Numbers between 1 and 10
+            } else if (difficulty === 'medium') {
+                return { min: 10, max: 50 }; // Numbers between 10 and 50
+            } else if (difficulty === 'hard') {
+                return { min: 50, max: 100 }; // Numbers between 50 and 100
             }
         }
 
-        // Start the next level
-        function nextLevel() {
-            playerPattern = [];
-            currentLevel++;
-            addToPattern();
-            showPattern();
+        // Check the user's answer
+        function checkAnswer() {
+            if (timeLeft <= 0) {
+                document.getElementById('feedback').innerText = 'Time’s up! You can’t answer anymore.';
+                document.getElementById('feedback').style.color = 'red';
+                return;
+            }
+            const userAnswer = parseInt(document.getElementById('answer').value);
+            stopTimer(); // Stop the timer when an answer is submitted
+            if (isNaN(userAnswer)) {
+                document.getElementById('feedback').innerText = 'Please enter a valid number!';
+                document.getElementById('feedback').style.color = 'red';
+            } else if (userAnswer === num1 + num2) {
+                document.getElementById('feedback').innerText = 'Correct! 🎉';
+                document.getElementById('feedback').style.color = 'green';
+            } else {
+                document.getElementById('feedback').innerText = `Incorrect. The correct answer is ${num1 + num2}.`;
+                document.getElementById('feedback').style.color = 'red';
+            }
         }
 
-        // Add a new square to the pattern
-        function addToPattern() {
-            const randomCell = Math.floor(Math.random() * gridSize);
-            pattern.push(randomCell);
-        }
-
-        // Show the pattern to the player
-        function showPattern() {
-            showingPattern = true;
-            let delay = 0;
-
-            pattern.forEach((index, i) => {
-                setTimeout(() => {
-                    highlightCell(index, '#ff6347'); // Highlight in orange
-                }, delay);
-
-                delay += 600;
-
-                setTimeout(() => {
-                    resetCell(index);
-                    if (i === pattern.length - 1) {
-                        showingPattern = false;
-                    }
-                }, delay);
-            });
-        }
-
-        // Start the game
-        function startGame() {
-            currentLevel = 1;
-            lives = 3;
-            pattern = [];
-            playerPattern = [];
-            statusDiv.textContent = 'Watch the pattern!';
-            addToPattern();
-            showPattern();
-        }
-
-        // Reset the game
+        // Reset the game when the difficulty is changed
         function resetGame() {
-            createGrid();
-            pattern = [];
-            playerPattern = [];
-            showingPattern = false;
-            startButton.disabled = false;
+            difficulty = document.getElementById('difficulty').value;
+            document.getElementById('question').innerText = 'Click "Start Game" to begin!';
+            document.getElementById('feedback').innerText = '';
+            document.getElementById('answer').value = '';
+            stopTimer();
         }
-
-        // Event listener for the Start button
-        startButton.addEventListener('click', () => {
-            startButton.disabled = true;
-            startGame();
-        });
-
-        // Initialize the grid when the page loads
-        window.onload = createGrid;
-
     </script>
-
 </body>
 </html>
