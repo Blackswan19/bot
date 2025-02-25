@@ -3,482 +3,151 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BsBlockhitter</title>
-    <link rel="icon" type="image/x-icon" href="https://i.ibb.co/Y252rbk/blockhitter.png">
+    <title>BTS Balloon Blast</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Oswald|Noto+Sans">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Oswald|Noto+Sans">
+    
     <style>
-         @import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&family=Orbitron:wght@400..900&family=Red+Hat+Display:ital,wght@0,300..900&family=Strait&display=swap');
-        * {
-            color: rgb(255, 255, 255);
-            font-family: "Red Hat Display", sans-serif;
-        }
         body {
+            font-family: "Noto Sans", sans-serif;
             margin: 0;
             overflow: hidden;
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            /* background: url('https://static.vecteezy.com/system/res/ources/previews/040/550/320/non_2x/ai-generated-cheerful-child-playing-with-cute-toy-animals-on-wooden-floor-generated-by-ai-free-photo.jpg') no-repeat center center/cover; */
+            /* font-family: 'Verdana, Geneva, Tahoma, sans-serif'; */
+            text-align: center;
+            color: white;
+            background-color: black;
+            transition: background 1s;
         }
-        #exitFullscreenButton {
-            top: 10px;
-            right: 10px;
-            display: none;
+        #game-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
         }
-        canvas {
-            display: block;
-            background-color: #181818;
-            touch-action: none;
+        
+        .balloon {
+            position: absolute;
+            width: 100px;
+            height: 130px;
+            background: radial-gradient(circle at 50% 30%, white, var(--color));
+            border-radius: 50%;
+            cursor: pointer;
+            animation: floatUp 5s linear forwards, swing 2s infinite ease-in-out;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+        }
+        
+        .balloon::after {
+            content: '';
+            position: absolute;
+            bottom: -16px;
+            width: 16px;
+            height: 22px;
+            background: var(--color);
+            clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
         }
 
-        #score, #misses {
+        .thread {
             position: absolute;
-            color: #fff;
-            font-size: 20px;
-            font-weight: bold;
-            padding: 10px;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            width: 2px;
+            height: 50px;
+            background: gray;
+            left: 50%;
+            top: 100%;
+            transform: translateX(-50%);
+            animation: swingThread 2s infinite ease-in-out;
+        }
+
+        @keyframes floatUp {
+            from { bottom: 0; }
+            to { bottom: 100vh; }
+        }
+
+        @keyframes swing {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(10px); }
+        }
+
+        @keyframes swingThread {
+            0%, 100% { transform: translateX(-50%) rotate(0deg); }
+            50% { transform: translateX(-50%) rotate(10deg); }
         }
         
         #score {
-            top: 10px;
-            left: 10px;
-        }
-
-        #misses {
-            top: 10px;
-            right: 10px;
-        }
-
-        #gameOver {
-            position: fixed;
-    background: #3e0101;
-    width: 100%;
-    text-align: center;
-    top: 35%;
-    padding: 14px 0px;
-    color: white;
-    font-size: 18px;
-    font-weight: 600;
-    display: none;
-        }
-
-        #startButton, #pauseButton, #rulesButton, #exitFullscreenButton {
             position: absolute;
-            padding: 15px 30px;
-            font-size: 15px;
-            cursor: pointer;
-            background-color: #004cff;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            font-weight: bold;
-            letter-spacing: 1px;
-        }
-
-        #startButton {
-            top: 50%;
+            top: 10px;
             left: 50%;
-            transform: translate(-50%, -50%);
-            background: #000645;
-            z-index: 10000;
-            white-space: nowrap;
-            height: 100%;
-            width: 100%;
-        }
-
-        #pauseButton {
-            top: 100px;
-            left: 10px;
-            background: none;
-        }
-
-        #rulesButton {
-            top: 100px;
-            right: 10px;
-            background: none;
-        }
-
-        .controls {
-            position: absolute;
-            bottom: 20px;
-            left: 45%;
             transform: translateX(-50%);
-            display: none;
-            justify-content: space-between;
-            width: 80%;
-        }
-
-        .button {
-            background-color: #004cff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            padding: 15px;
-            font-size: 18px;
-            cursor: pointer;
-            flex: auto;
-            margin: 148px 43px;
-            transition: background-color 0.3s;
-        }
-
-        #rulesModal {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: rgb(51 51 51);
-            color: white;
-            padding: 20px;
+            font-size: 24px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px 20px;
             border-radius: 10px;
-            display: none;
-            z-index: 1000;
-            width: 84%;
-            text-align: center;
         }
-
-        #closeRules {
-            cursor: pointer;
-            color: #004cff;
-            font-weight: bold;
-            margin-top: 10px;
-        }
-       .button {
-    width: 100px; /* Set button width */
-    height: 50px; /* Set button height */
-}
-
-/* For smaller screens, reduce the padding or use a more responsive layout */
-     @keyframes fadeIn {
-            0% { opacity: 0; }
-            100% { opacity: 1; }
-        }
-
-        @media (max-width: 480px) {
-            #mobileControls {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
- position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    width: 100%; /* Ensures it takes the full width */
-    padding: 10px 20px; /* Adds some padding for aesthetics */
-    z-index: 1000; /* Ensures it stays above other elements */
-    
-}
-
-.button {
-    width: 100px;
-        height: 50px;
-        color: white;
-        border: none;
-        border-radius: 6px;
-        padding: 15px;
-        font-size: 18px;
-        cursor: pointer;
-        margin: 0 65px;
-        background: none;
-        border: solid 1px gray;
-}
-
-        }
-    </style>
     </style>
 </head>
 <body>
-
-    <div class="all" style="position: fixed; left: 0px; right: 0px;">
+    <div id="game-container">
         <div id="score">Score: 0</div>
-        <div id="misses">Misses: 0</div>
-        <div id="gameOver">Game Over!<br>Too many misses.</div>
-        <button id="pauseButton">Pause</button>
-        <button id="rulesButton">Rules</button>
     </div>
-    <button id="startButton"><span style="font-size: 35px;
-    color: #004cff;">BsBlockhitter</span><br> Start Game</button>
-    <canvas id="gameCanvas"></canvas>
-    <div class="controls" id="mobileControls" style="
-    display: flex;
-        position: fixed;
-        width: 115%;
-        left: 50%;
-        bottom: 220px;
-        gap: 66px;
-        margin: 0px;
-">
-        <button id="leftButton" class="button"></button>
-        <button id="rightButton" class="button"></button>
-    </div>
-    <button id="exitFullscreenButton">Exit Full-Screen</button>
-
-    <!-- Countdown Display -->
-    <div id="countdown" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 48px; font-weight: bold; color: white; display: none;">
-        10
-    </div>
-
-    <div id="rulesModal">
-        <h2>Game Rules</h2>
-        <p>1. Move your block left and right to hit the obstacles.</p>
-        <p>2. Score points by hitting obstacles.</p>
-        <p>3. You have a maximum of 20 misses. If you exceed this, the game is over!</p>
-        <p>4. The game speeds up over time, so stay alert!</p>
-        <span id="closeRules">Close</span>
-    </div>
-
+    
     <script>
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
-        const scoreDisplay = document.getElementById('score');
-        const missesDisplay = document.getElementById('misses');
-        const gameOverDisplay = document.getElementById('gameOver');
-        const startButton = document.getElementById('startButton');
-        const pauseButton = document.getElementById('pauseButton');
-        const rulesButton = document.getElementById('rulesButton');
-        const leftButton = document.getElementById('leftButton');
-        const rightButton = document.getElementById('rightButton');
-        const mobileControls = document.getElementById('mobileControls');
-        const rulesModal = document.getElementById('rulesModal');
-        const closeRulesButton = document.getElementById('closeRules');
-        const countdownDisplay = document.getElementById('countdown');
-        const exitFullscreenButton = document.getElementById('exitFullscreenButton');
-
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        resizeCanvas();
-        window.addEventListener('resize', resizeCanvas);
-
-        function toggleMobileControls() {
-            const isMobile = window.innerWidth <= 480;
-            mobileControls.style.display = isMobile ? 'flex' : 'none';
-        }
-        toggleMobileControls();
-        window.addEventListener('resize', toggleMobileControls);
-
-        const car = {
-            width: 50,
-            height: 100,
-            x: canvas.width / 2 - 25,
-            y: canvas.height - 120,
-            speed: 7,
-            moveLeft: false,
-            moveRight: false,
-        };
-
-        const obstacles = [];
-        let obstacleSpeed = 5;
-        let obstacleInterval = 2000;
-        let isGameRunning = false;
-        let isPaused = false;
         let score = 0;
-        let misses = 0;
-        let maxMisses = 20;
-        let lastObstacleTime = 0;
-
-        function moveCar() {
-            if (car.moveLeft && car.x > 0) {
-                car.x -= car.speed;
-            }
-            if (car.moveRight && car.x < canvas.width - car.width) {
-                car.x += car.speed;
-            }
-        }
-
-        function drawCar() {
-            ctx .fillStyle = 'blue';
-            ctx.strokeStyle = 'white';
-            ctx.lineWidth = 1;
-            ctx.fillRect(car.x, car.y, car.width, car.height);
-            ctx.strokeRect(car.x, car.y, car.width, car.height);
-        }
-
-        function drawObstacles() {
-            for (let i = 0; i < obstacles.length; i++) {
-                const obs = obstacles[i];
-                const gradient = ctx.createLinearGradient(obs.x, obs.y, obs.x + obs.width, obs.y + obs.height);
-                gradient.addColorStop(0, '#ff1900');
-                gradient.addColorStop(1, '#ff1900');
-                ctx.fillStyle = gradient;
-                ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
-            }
-        }
-
-        function updateObstacles() {
-    for (let i = 0; i < obstacles.length; i++) {
-        obstacles[i].y += obstacleSpeed;
-
-        if (obstacles[i].y > canvas.height) {
-            obstacles.splice(i, 1);
-            misses++;
-            missesDisplay.textContent = `Misses: ${misses}`;
-            if (misses >= maxMisses) {
-                endGame();
-            }
-        }
-    }
-
-    const currentTime = Date.now();
-    if (currentTime - lastObstacleTime > obstacleInterval) {
-        const shapeType = Math.random();  // Random number to decide the shape
-
-        let obsWidth, obsHeight, isCube;
         
-        // Randomly decide whether it's a square, rectangle, or cube
-        if (shapeType < 0.33) {
-            // Square
-            obsWidth = obsHeight = 50;
-            isCube = false;
-        } else if (shapeType < 0.66) {
-            // Rectangle
-            obsWidth = 70;
-            obsHeight = 40;
-            isCube = false;
-        } else {
-            // Cube
-            obsWidth = obsHeight = 50;
-            isCube = true;
-        }
+        function createBalloon() {
+            const balloon = document.createElement('div');
+            balloon.classList.add('balloon');
+            const colors = [
+  'rgba(255, 105, 180, 0.5)',  // Light Pink
+  'rgba(255, 69, 0, 0.5)',     // Light Orange-Red
+  'rgba(30, 144, 255, 0.5)',   // Light Dodger Blue
+  'rgba(50, 205, 50, 0.5)',    // Light Lime Green
+  'rgba(255, 255, 0, 0.5)'     // Light Yellow
+];
 
-        const obsX = Math.random() * (canvas.width - obsWidth);
-        const obsY = -obsHeight;
-        obstacles.push({ x: obsX, y: obsY, width: obsWidth, height: obsHeight, isCube: isCube });
-        lastObstacleTime = currentTime;
-    }
-}
-
-        function checkCollision() {
-            for (let i = 0; i < obstacles.length; i++) {
-                const obs = obstacles[i];
-                if (car.x < obs.x + obs.width &&
-                    car.x + car.width > obs.x &&
-                    car.y < obs.y + obs.height &&
-                    car.height + car.y > obs.y) {
-                    obstacles.splice(i, 1);
-                    score++;
-                    scoreDisplay.textContent = `Score: ${score}`;
-                    return;
-                }
-            }
-        }
-
-        function gameLoop() {
-            if (isGameRunning && !isPaused) {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                moveCar();
-                drawCar();
-                updateObstacles();
-                drawObstacles();
-                checkCollision();
-                obstacleSpeed += 0.002;
-                obstacleInterval -= 0.3;
-                requestAnimationFrame(gameLoop);
-            }
-        }
-
-        function endGame() {
-            isGameRunning = false;
-            gameOverDisplay.style.display = 'block';
+            balloon.style.setProperty('--color', colors[Math.floor(Math.random() * colors.length)]);
+            balloon.style.left = `${Math.random() * 90}vw`;
+            
+            const thread = document.createElement('div');
+            thread.classList.add('thread');
+            balloon.appendChild(thread);
+            
+            balloon.addEventListener('click', () => {
+                const burst = document.createElement('div');
+                burst.style.position = 'absolute';
+                burst.style.top = balloon.style.top;
+                burst.style.left = balloon.style.left;
+                burst.style.width = '200px';
+                burst.style.height = '200px';
+                burst.style.background = balloon.style.getPropertyValue('--color');
+                burst.style.borderRadius = '50%';
+                burst.style.opacity = '0.7';
+                burst.style.transition = 'opacity 0.5s ease-out';
+                document.body.appendChild(burst);
+                
+                setTimeout(() => burst.remove(), 500);
+                document.body.style.backgroundColor = balloon.style.getPropertyValue('--color');
+                setTimeout(() => document.body.style.backgroundColor = '', 300);
+                
+                balloon.remove();
+                score += 1;
+                document.getElementById('score').innerText = `Score: ${score}`;
+                
+                const popSound = new Audio('https://www.myinstants.com/media/sounds/balloon-pop.mp3');
+                popSound.play();
+            });
+            
+            document.getElementById('game-container').appendChild(balloon);
+            
             setTimeout(() => {
-                gameOverDisplay.style.display = 'none';
-                startButton.style.display = 'block';
-                score = 0;
-                misses = 0;
-                scoreDisplay.textContent = `Score: ${score}`;
-                missesDisplay.textContent = `Misses: ${misses}`;
-            }, 3000);
+                balloon.remove();
+            }, 5000);
         }
-
-        function resetGame() {
-            car.x = canvas.width / 2 - car.width / 2;
-            car.y = canvas.height - car.height - 20;
-            obstacles.length = 0;
-            obstacleSpeed = 5;
-            obstacleInterval = 2000;
-            score = 0;
-            misses = 0;
-            scoreDisplay.textContent = `Score: ${score}`;
-            missesDisplay.textContent = `Misses: ${misses}`;
-            isPaused = false;
-            gameOverDisplay.style.display = 'none';
-        }
-
-        function startGame() {
-            if (document.fullscreenElement === null) {
-                if (document.documentElement.requestFullscreen) {
-                    document.documentElement.requestFullscreen();
-                } else if (document.documentElement.webkitRequestFullscreen) {
-                    document.documentElement.webkitRequestFullscreen();
-                } else if (document.documentElement.msRequestFullscreen) {
-                    document.documentElement.msRequestFullscreen();
-                }
-            }
-            startButton.style.display = 'none';  // Hide start button
-            let countdown = 10;  // Set countdown to 10 seconds
-            countdownDisplay.textContent = countdown;  // Show the initial countdown
-            countdownDisplay.style.display = 'block';  // Make the countdown visible
-
-            // Start the countdown interval
-            const countdownInterval = setInterval(() => {
-                countdown--;
-                countdownDisplay.textContent = countdown;
-
-                // When countdown reaches 0, start the game
-                if (countdown <= 0) {
-                    clearInterval(countdownInterval);  // Stop the countdown
-                    countdownDisplay.style.display = 'none';  // Hide the countdown
-                    isGameRunning = true;  // Start the game
-                    resetGame(); // Reset game state
-                    gameLoop();  // Start game loop
-
-                    // Request full screen
-                    const elem = document.documentElement;
-                    if (elem.requestFullscreen) {
-                        elem.requestFullscreen();
-                    } else if (elem.mozRequestFullScreen) { /* Firefox */
-                        elem.mozRequestFullScreen();
-                    } else if (elem.webkitRequestFullScreen) { /* Chrome, Safari & Opera */
-                        elem.webkitRequestFullScreen();
-                    } else if (elem.msRequestFullScreen) { /* IE/Edge */
-                        elem.msRequestFullScreen();
-                    }
-                }
-            }, 1000);  // Update countdown every second
-        }
-
-        startButton.addEventListener('click', startGame);
-
-        pauseButton.addEventListener('click', function () {
-            isPaused = !isPaused;
-            if (!isPaused && isGameRunning) {
-                gameLoop();
-            }
-        });
-
-        leftButton.addEventListener('touchstart', () => car.moveLeft = true);
-        leftButton.addEventListener('touchend', () => car.moveLeft = false);
-
-        rightButton.addEventListener('touchstart', () => car.moveRight = true);
-        rightButton.addEventListener('touchend', () => car.moveRight = false);
-
-        window.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowLeft') car.moveLeft = true;
-            if (e.key === 'ArrowRight') car.moveRight = true;
-        });
-
-        window.addEventListener('keyup', (e) => {
-            if (e.key === 'ArrowLeft') car.moveLeft = false;
-            if (e.key === 'ArrowRight') car.moveRight = false;
-        });
-
-        rulesButton.addEventListener('click', () => rulesModal.style.display = 'block');
-        closeRulesButton.addEventListener('click', () => rulesModal.style.display = 'none');
-
-        exitFullscreenButton.addEventListener('click', () => {
-            if (document.fullscreenElement) {
-                document.exitFullscreen();
-            }
-        });
-
+        
+        setInterval(createBalloon, 800);
     </script>
 </body>
 </html>
